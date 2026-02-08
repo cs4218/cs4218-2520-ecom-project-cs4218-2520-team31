@@ -22,6 +22,10 @@ jobs:
         run: npm install
 
       - name: Run backend tests
+        env:
+          BRAINTREE_MERCHANT_ID: dummy
+          BRAINTREE_PUBLIC_KEY: dummy
+          BRAINTREE_PRIVATE_KEY: dummy
         run: npm run test:backend
 
       - name: Run frontend tests
