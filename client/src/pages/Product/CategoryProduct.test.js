@@ -82,6 +82,57 @@ describe("CategoryProduct Unit Tests", () => {
     expect(getByText("Samsung S24")).toBeInTheDocument();
   });
 
+  it("shows 0 result found when category has no products", async () => {
+    const apiRes = {
+      data: {
+        category: { name: "Phones" },
+        products: [],
+      },
+    };
+    axios.get.mockResolvedValueOnce(apiRes);
+    const { findByText, getByText } = render(
+      <MemoryRouter initialEntries={["/category/phones"]}>
+        <Routes>
+          <Route path="/category/:slug" element={<CategoryProduct />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(await findByText("Category - Phones")).toBeInTheDocument();
+    expect(getByText(/0 result found/i)).toBeInTheDocument();
+  });
+  it("renders product image src using product-photo endpoint and truncates description", async () => {
+    const longDesc =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ";
+    const expectedTrunc = `${longDesc.substring(0, 60)}...`;
+    const apiRes = {
+      data: {
+        category: { name: "Phones" },
+        products: [
+          {
+            _id: "p1",
+            name: "iPhone 15",
+            slug: "iphone-15",
+            description: longDesc,
+            price: 1999,
+          },
+        ],
+      },
+    };
+    axios.get.mockResolvedValueOnce(apiRes);
+    const { findByText, getByAltText, getByText } = render(
+      <MemoryRouter initialEntries={["/category/phones"]}>
+        <Routes>
+          <Route path="/category/:slug" element={<CategoryProduct />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    await findByText("Category - Phones");
+    await findByText("iPhone 15");
+    const img = getByAltText("iPhone 15");
+    expect(img).toHaveAttribute("src", "/api/v1/product/product-photo/p1");
+    expect(getByText(expectedTrunc)).toBeInTheDocument();
+  });
+
   it("navigate to product details", async () => {
     const apiRes = {
       data: {

@@ -1,10 +1,13 @@
 /**
  * Backend Unit Tests: 
  * 
- * Testing for Product Details page
+ * Testing for FE Product Details page
  * - getSingleProductController
  * - productPhotoController
  * - realtedProductController
+ * - productCategoryController
+ * 
+ * Testing for FE Category Product page
  * - productCategoryController
  */
 
@@ -32,7 +35,15 @@ function mockRes() {
 
 describe("Product Controller APIs", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks();		
+
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.log.mockRestore();
+    console.error.mockRestore();
   });
 
   describe("getSingleProductController", () => {
@@ -203,8 +214,8 @@ describe("Product Controller APIs", () => {
       const req = { params: { slug: "phones" } };
       const res = mockRes();
 
-      categoryModel.findOne.mockResolvedValue({ _id: "c1", slug: "phones", name: "Phones" });
-
+      const categoryDoc = { _id: "c1", slug: "phones", name: "Phones" };
+      categoryModel.findOne.mockResolvedValue(categoryDoc);
       const exec = jest.fn().mockResolvedValue([
         { _id: "p1", name: "iPhone 15" },
       ]);
@@ -216,12 +227,92 @@ describe("Product Controller APIs", () => {
       await productCategoryController(req, res);
 
       expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "phones" });
-      expect(productModel.find).toHaveBeenCalledWith({ category: expect.any(Object) });
+      expect(productModel.find).toHaveBeenCalledWith({ category: categoryDoc });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
           category: expect.objectContaining({ slug: "phones" }),
+          products: expect.any(Array),
+        })
+      );
+    });
+
+    it("should return 200 with empty products when category has no products", async () => {
+      const req = { params: { slug: "phones" } };
+      const res = mockRes();
+
+      const categoryDoc = { _id: "c1", slug: "phones", name: "Phones" };
+      categoryModel.findOne.mockResolvedValue(categoryDoc);
+
+      const exec = jest.fn().mockResolvedValue([]);
+      productModel.find.mockReturnValue({ populate: exec });
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          category: expect.objectContaining({ name: "Phones" }),
+          products: [],
+        })
+      );
+    });
+
+    it("should call populate('category') when fetching category products", async () => {
+      const req = { params: { slug: "phones" } };
+      const res = mockRes();
+
+      const categoryDoc = { _id: "c1", slug: "phones", name: "Phones" };
+      categoryModel.findOne.mockResolvedValue(categoryDoc);
+
+      const populateMock = jest.fn().mockResolvedValue([]);
+      productModel.find.mockReturnValue({ populate: populateMock });
+
+      await productCategoryController(req, res);
+
+      expect(productModel.find).toHaveBeenCalledWith({ category: categoryDoc });
+      expect(populateMock).toHaveBeenCalledWith("category");
+    });
+
+    it("should return 400 if product lookup fails after category found", async () => {
+      const req = { params: { slug: "phones" } };
+      const res = mockRes();
+
+      const categoryDoc = { _id: "c1", slug: "phones", name: "Phones" };
+      categoryModel.findOne.mockResolvedValue(categoryDoc);
+
+      const populateMock = jest.fn().mockRejectedValue(new Error("DB fail"));
+      productModel.find.mockReturnValue({ populate: populateMock });
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          message: "Error While Getting products",
+        })
+      );
+    });
+
+    it("should return 200 even if category slug not found and will return products result", async () => {
+      const req = { params: { slug: "nonexistent" } };
+      const res = mockRes();
+
+      categoryModel.findOne.mockResolvedValue(null);
+
+      const populateMock = jest.fn().mockResolvedValue([]);
+      productModel.find.mockReturnValue({ populate: populateMock });
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          category: null,
           products: expect.any(Array),
         })
       );
@@ -244,4 +335,6 @@ describe("Product Controller APIs", () => {
       );
     });
   });
+
+  
 });
