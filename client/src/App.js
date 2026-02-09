@@ -18,9 +18,9 @@ import Profile from "./pages/user/Profile";
 import Products from "./pages/admin/Products";
 import UpdateProduct from "./pages/admin/UpdateProduct";
 import Search from "./pages/Search";
-import ProductDetails from "./pages/ProductDetails";
+import ProductDetails from "./pages/Product/ProductDetails";
 import Categories from "./pages/Categories";
-import CategoryProduct from "./pages/CategoryProduct";
+import CategoryProduct from "./pages/Product/CategoryProduct";
 import CartPage from "./pages/CartPage";
 import AdminOrders from "./pages/admin/AdminOrders";
 function App() {
