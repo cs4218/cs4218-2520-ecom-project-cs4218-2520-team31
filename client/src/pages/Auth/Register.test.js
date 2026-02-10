@@ -14,22 +14,24 @@ jest.mock('../../context/auth', () => ({
     useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
   }));
 
-  jest.mock('../../context/cart', () => ({
+jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
-  }));
+}));
     
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
   }));  
 
-  Object.defineProperty(window, 'localStorage', {
-    value: {
-      setItem: jest.fn(),
-      getItem: jest.fn(),
-      removeItem: jest.fn(),
-    },
-    writable: true,
-  });
+jest.mock('../../hooks/useCategory', () => jest.fn(() => []));
+
+Object.defineProperty(window, 'localStorage', {
+  value: {
+    setItem: jest.fn(),
+    getItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  writable: true,
+});
 
 window.matchMedia = window.matchMedia || function() {
     return {
@@ -47,6 +49,7 @@ describe('Register Component', () => {
 
   it('should register the user successfully', async () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
+    //axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
     const { getByText, getByPlaceholderText } = render(
         <MemoryRouter initialEntries={['/register']}>
@@ -72,6 +75,7 @@ describe('Register Component', () => {
 
   it('should display error message on failed registration', async () => {
     axios.post.mockRejectedValueOnce({ message: 'User already exists' });
+    //axios.get.mockResolvedValueOnce({ data: { category: [] } });
 
     const { getByText, getByPlaceholderText } = render(
         <MemoryRouter initialEntries={['/register']}>
