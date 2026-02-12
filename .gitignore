@@ -6,3 +6,5 @@ node_modules
 .env
 coverage/
 .scannerwork/
+my_sprint_plan.md
+context.md
