@@ -15,4 +15,20 @@ describe('authHelper', () => {
 
         expect(hashed).toBeUndefined();
     });
+
+    test('test comparePassword should return true if password matches', async () => {
+        const password = 'password123';
+        const hashed = await hashPassword(password);
+
+        const hashedResult = await comparePassword(password, hashed);
+        expect(hashedResult).toBe(true);
+    });
+
+    test('test comparePassword should return false if password return non-matching result', async () => {
+        const password = 'password123';
+        const hashed = await hashPassword(password);
+
+        const hashedResult = await comparePassword('anotherPassword123', hashed);
+        expect(hashedResult).toBe(false);
+    });
 });
