@@ -1,11 +1,14 @@
+// Brenna Lauren Tan Jia Ern, A0254710M
 import { getOrdersController } from "../authController.js";
 import orderModel from "../../models/orderModel.js";
 import { getAllOrdersController } from "../authController.js";
+import { orderStatusController } from "../authController.js";
 
 jest.mock("../../models/orderModel.js", () => ({
   __esModule: true,
   default: {
     find: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
   },
 }));
 
@@ -238,5 +241,104 @@ describe("AuthController Component: User Order Retrieval Logic ", () => {
 
     // Assert
     expect(query.sort).toHaveBeenCalledWith({ createdAt: "-1" });
+  });
+});
+
+describe("AuthController Component: Order Status Update Logic", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  })
+
+  it("should extract orderId from request parameters and pass it to orderModel", async () => {
+    // Arrange
+    const req = { params: { orderId: "order123" }, body: { status: "Shipped" } };
+    const res = makeRes();
+
+    orderModel.findByIdAndUpdate.mockResolvedValue({ _id: "order123", status: "Shipped" });
+  
+    // Act
+    await orderStatusController(req, res);
+
+    // Assert
+    expect(orderModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      "order123",
+      expect.any(Object),
+      expect.any(Object)
+    );
+  });
+
+  it("should extract status from JSON request and pass it to orderModel", async () => {
+    // Arrange
+    const req = { params: { orderId: "order123" }, body: { status: "Shipped" }};
+    const res = makeRes();
+
+    orderModel.findByIdAndUpdate.mockResolvedValue({ _id: "order123", status: "Shipped" });
+
+    // Act
+    await orderStatusController(req, res);
+
+    // Assert
+    expect(orderModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      expect.any(String),
+      { status: "Shipped" },
+      expect.any(Object)
+    );
+  });
+
+  it("should invoke data model update to return updated order", async () => {
+    // Arrange
+    const req = { params: { orderId: "order123" }, body: { status: "Shipped" }};
+    const res = makeRes();
+
+    orderModel.findByIdAndUpdate.mockResolvedValue({ _id: "order123", status: "Shipped"});
+
+    // Act
+    await orderStatusController(req, res);
+
+    // Arrange
+    expect(orderModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(Object),
+      { new: true }
+    );
+  });
+
+  it("should return the updated order in success JSON response", async () => {
+    // Arrange
+    const req = { params: { orderId: "order123" }, body: { status: "Shipped" }};
+    const res = makeRes();
+
+    const updatedOrder = { _id: "order123", status: "Shipped" };
+    orderModel.findByIdAndUpdate.mockResolvedValue(updatedOrder);
+
+    // Act
+    await orderStatusController(req, res);
+
+    // Assert
+    expect(res.json).toHaveBeenCalledWith(updatedOrder);
+  });
+
+  it("should handle update failure by returning 500 and error payload", async () => {
+    // Arrange
+    const req = { params: { orderId: "order123" }, body: { status: "Shipped" }};
+    const res = makeRes();
+
+    const dbError = new Error("DB failure");
+    orderModel.findByIdAndUpdate.mockRejectedValue(dbError);
+
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    // Act
+    await orderStatusController(req, res);
+
+    // Assert
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "Error While Updateing Order",
+      error: dbError,
+    });
+
+    logSpy.mockRestore();
   });
 });
