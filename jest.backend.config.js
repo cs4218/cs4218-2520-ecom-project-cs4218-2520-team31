@@ -19,6 +19,7 @@ module.exports = {
     "controllers/**/*.js",
     "helpers/**/*.js",
     "middlewares/**/*.js",
+    "models/**/*.js",
     "!**/*.test.js",
     "!controllers/_tests_/**"],
   coverageThreshold: {
