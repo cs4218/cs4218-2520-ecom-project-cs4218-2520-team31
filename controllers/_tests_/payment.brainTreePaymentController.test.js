@@ -1,5 +1,7 @@
 // Brenna Lauren Tan Jia Ern, A0254710M
 
+import { describe } from "node:test";
+
 const makeRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
@@ -266,5 +268,110 @@ describe("ProductController Component: Payment Amount Calculation", () => {
       // Assert
       expect(res.json).toHaveBeenCalledWith({ok: true});
     });
+  });
+});
+
+describe("ProductController Component: Failed Transaction Handling", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  });
+
+  it("should respond with status 500 and send error payload when gateway returns no valid result", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const gatewayError = new Error("Gateway failed");
+
+    const { brainTreePaymentController } = await setupPaymentController({
+      saleImplementation: (payload, cb) => {
+        cb(gatewayError, null);
+        return null;
+      },
+    });
+
+    const req = { body: { nonce, cart }, user: { _id: "user123" } };
+    const res = makeRes();
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(gatewayError);
+  });
+
+  it("should not create or save an order when transaction fails", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const gatewayError = new Error("Gateway failed");
+
+    const { brainTreePaymentController, OrderModelMock, saveMock } = await setupPaymentController({
+      saleImplementation: (payload, cb) => {
+        cb(gatewayError, null);
+        return null;
+      },
+    });
+
+    const req = { body: { nonce, cart }, user: { _id: "user123" } };
+    const res = makeRes();
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert
+    expect(OrderModelMock).not.toHaveBeenCalled();
+    expect(saveMock).not.toHaveBeenCalled();
+  });
+
+  it("should not return success response when transaction fails", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const gatewayError = new Error("Gateway failed");
+
+    const { brainTreePaymentController } = await setupPaymentController({
+      saleImplementation: (payload, cb) => {
+        cb(gatewayError, null);
+        return null;
+      },
+    });
+
+    const req = { body: { nonce, cart }, user: { _id: "user123" } };
+    const res = makeRes();
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert
+    expect(res.json).not.toHaveBeenCalledWith({ ok: true });
+  });
+
+  it("should catch and log synchronous errors", async () => {
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const thrown = new Error("Synchronous failure");
+
+    const { brainTreePaymentController } = await setupPaymentController({
+      saleImplementation: () => {
+        throw thrown;
+      },
+    });
+
+    const req = { body: { nonce, cart }, user: { _id: "user123" }};
+    const res = makeRes();
+
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    await brainTreePaymentController(req, res);
+
+    expect(logSpy).toHaveBeenCalledWith(thrown);
+
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.send).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
+
+    logSpy.mockRestore();
   });
 });
