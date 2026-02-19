@@ -1,6 +1,13 @@
 import { hashPassword, comparePassword } from "./authHelper";
+import { silenceConsole } from "../controllers/_tests_/utils.js";
 
 describe('authHelper', () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        restoreConsole = silenceConsole();
+    });
+
     test('test hashPassword should return a hashed string', async () => {
         const password = 'password123';
         const hashed = await hashPassword(password);

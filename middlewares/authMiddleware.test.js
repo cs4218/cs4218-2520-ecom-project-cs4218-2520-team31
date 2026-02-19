@@ -1,6 +1,8 @@
 import JWT from "jsonwebtoken";
 import { requireSignIn, isAdmin } from "./authMiddleware.js";
 import userModel from "../models/userModel.js";
+import { silenceConsole } from "../controllers/_tests_/utils.js";
+
 
 jest.mock("jsonwebtoken");
 jest.mock("../models/userModel.js");
@@ -19,6 +21,7 @@ describe('requireSignIn middleware', () => {
         res = {};
         next = jest.fn();
         jest.clearAllMocks();
+        restoreConsole = silenceConsole();
     });
 
     test('should call next() and set request user if token is valid', async () => {
@@ -60,6 +63,7 @@ describe('isAdmin middleware', () => {
         };
         next = jest.fn();
         jest.clearAllMocks();
+        restoreConsole = silenceConsole();
     });
 
     test('testing isAdmin should call next() if user is admin (role === 1)', async () => {
