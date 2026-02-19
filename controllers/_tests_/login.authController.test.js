@@ -1,12 +1,12 @@
-import { registerController, loginController } from "./authController.js";
-import { silenceConsole, mockRes } from "./_tests_/utils.js";
-import { hashPassword, comparePassword } from "../helpers/authHelper.js";
-import userModel from "../models/userModel.js";
+import { registerController, loginController, forgotPasswordController } from "../authController.js";
+import { silenceConsole, mockRes } from "./utils.js";
+import { hashPassword, comparePassword } from "../../helpers/authHelper.js";
+import userModel from "../../models/userModel.js";
 import JWT from "jsonwebtoken"
 
-jest.mock("../models/userModel.js");
+jest.mock("../../models/userModel.js");
 jest.mock("jsonwebtoken");
-jest.mock("../helpers/authHelper.js");
+jest.mock("../../helpers/authHelper.js");
 
 describe('testing registerController', () => {
 
