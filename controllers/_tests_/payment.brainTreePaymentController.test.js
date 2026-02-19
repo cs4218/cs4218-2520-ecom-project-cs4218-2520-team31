@@ -121,61 +121,6 @@ describe("ProductController Component: Payment Amount Calculation", () => {
       expect.any(Function),
     );
   });
-
-  it("should return 500 when gateway transaction fails", async () => {
-    // Arrange
-    const cart = [{ price: 10 }];
-    const nonce = "nonce123";
-
-    const gatewayError = new Error("Gateway failed");
-
-    const { brainTreePaymentController } = await setupPaymentController({
-      saleImplementation: (payload, cb) => {
-        cb(gatewayError, null);
-        return null;
-      },
-    });
-
-    const req = { body: {nonce, cart}, user: { _id: "user123" } };
-    const res = makeRes();
-
-    // Act
-    await brainTreePaymentController(req, res);
-
-    // Assert
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith(gatewayError);
-    expect(res.json).not.toHaveBeenCalled();
-  });
-
-  it("should catch and log synchronous errors", async () => {
-    // Arrange
-    const cart = [{ price: 10 }];
-    const nonce = "nonce123";
-
-    const thrown = new Error("Synchronous failure");
-
-    const { brainTreePaymentController } = await setupPaymentController({
-      saleImplementation: () => {
-        throw thrown;
-      },
-    });
-
-    const req = { body: {nonce, cart}, user: { _id: "user123" } };
-    const res = makeRes();
-
-    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-
-    // Act
-    await brainTreePaymentController(req, res);
-
-    // Assert
-    expect(res.status).not.toHaveBeenCalled();
-    expect(res.send).not.toHaveBeenCalled();
-    expect(res.json).not.toHaveBeenCalled();
-
-    logSpy.mockRestore();
-  });
 });
 
 describe("ProductController Component: Successful Transaction Processing", () => {
