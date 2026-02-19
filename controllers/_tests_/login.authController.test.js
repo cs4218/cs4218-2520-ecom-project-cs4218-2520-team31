@@ -1,4 +1,4 @@
-import { registerController, loginController, forgotPasswordController } from "../authController.js";
+import { registerController, loginController, forgotPasswordController, testController } from "../authController.js";
 import { silenceConsole, mockRes } from "./utils.js";
 import { hashPassword, comparePassword } from "../../helpers/authHelper.js";
 import userModel from "../../models/userModel.js";
@@ -346,4 +346,30 @@ describe('testing for forgotPasswordController', () => {
             })
         );
     });
+});
+
+describe('testing testController', () => {
+
+    test('should send "Protected Routes"', async () => {
+        const req = {};
+        const res = mockRes();
+
+        testController(req, res);
+
+        expect(res.send).toHaveBeenCalledWith("Protected Routes");
+    });
+
+    test('should return error when send fails', async () => {
+        const req = {};
+        const res = mockRes();
+        silenceConsole();
+        res.send.mockImplementationOnce(() => { throw new Error("send failed"); });
+
+        testController(req, res);
+
+        expect(res.send).toHaveBeenCalledWith(
+            expect.objectContaining({ error: expect.any(Error) })
+        );
+    });
+
 });
