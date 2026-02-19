@@ -144,3 +144,17 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
+## 6. Team Workload
+
+This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
+
+### Brenna Lauren Tan
+**Features unit tested:**
+   1. Order feature
+   2. Payment feature
+
+**Source Files tested & unit test files created:**
+   1. Order.js (Orders.test.js)
+   2. authController.js (order.authController.test.js)
+   3. orderModel.js (orderModel.test.js)
+   4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
