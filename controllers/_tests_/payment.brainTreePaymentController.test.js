@@ -98,7 +98,7 @@ describe("ProductController Component: Payment Amount Calculation", () => {
     );
   });
 
-    it("should handle multi-item cart by passing correct summed amount to gateway", async () => {
+  it("should handle multi-item cart by passing correct summed amount to gateway", async () => {
     // Arrange
     const cart = [{price: 10}, {price: 25}, {price: 5}];
     const nonce = "nonce123";
@@ -176,98 +176,98 @@ describe("ProductController Component: Payment Amount Calculation", () => {
 
     logSpy.mockRestore();
   });
+});
 
-  describe("ProductController Component: Successful Transaction Processing", () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      jest.resetModules();
+describe("ProductController Component: Successful Transaction Processing", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  });
+
+  it("should call gateway.transaction.sale with required fields and callback", async () => {
+    // Arrange
+    const cart = [{ price: 10 }, { price: 5 }];
+    const nonce = "nonce123";
+
+    const { brainTreePaymentController, saleMock } = await setupPaymentController();
+
+    const req = { body: { nonce, cart }, user: { _id: "user123" }};
+    const res = makeRes();
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert
+    expect(saleMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: expect.any(Number),
+        paymentMethodNonce: nonce,
+        options: { submitForSettlement: true },
+      }),
+      expect.any(Function)
+    );
+  });
+
+  it("should create an orderModel instance with correct fields when transaction succeeds", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const userId = "user123";
+    const result = { id: "txn-success" };
+
+    const { brainTreePaymentController, OrderModelMock } = await setupPaymentController({ 
+      saleImplementation: (payload, cb) => cb(null, result),
     });
 
-    it("should call gateway.transaction.sale with required fields and callback", async () => {
-      // Arrange
-      const cart = [{ price: 10 }, { price: 5 }];
-      const nonce = "nonce123";
+    const req = { body: { nonce, cart }, user: { _id: userId } };
+    const res = makeRes();
 
-      const { brainTreePaymentController, saleMock } = await setupPaymentController();
+    // Act
+    await brainTreePaymentController(req, res);
 
-      const req = { body: { nonce, cart }, user: { _id: "user123" }};
-      const res = makeRes();
+    // Assert
+    expect(OrderModelMock).toHaveBeenCalledWith({
+      products: cart,
+      payment: result,
+      buyer: userId,
+    });
+  });
 
-      // Act
-      await brainTreePaymentController(req, res);
+  it("should trigger order save operation on successful transaction", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
+    const result = { id: "txn-success" };
 
-      // Assert
-      expect(saleMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          amount: expect.any(Number),
-          paymentMethodNonce: nonce,
-          options: { submitForSettlement: true },
-        }),
-        expect.any(Function)
-      );
+    const { brainTreePaymentController, saveMock } = await setupPaymentController({
+      saleImplementation: (payload, cb) => cb(null, result),
     });
 
-    it("should create an orderModel instance with correct fields when transaction succeeds", async () => {
-      // Arrange
-      const cart = [{ price: 10 }];
-      const nonce = "nonce123";
-      const userId = "user123";
-      const result = { id: "txn-success" };
+    const req = { body: { nonce, cart }, user: { _id: "user123" }};
+    const res = makeRes();
 
-      const { brainTreePaymentController, OrderModelMock } = await setupPaymentController({ 
-        saleImplementation: (payload, cb) => cb(null, result),
-      });
+    // Act
+    await brainTreePaymentController(req, res);
 
-      const req = { body: { nonce, cart }, user: { _id: userId } };
-      const res = makeRes();
+    // Assert
+    expect(saveMock).toHaveBeenCalledTimes(1);
+  });
 
-      // Act
-      await brainTreePaymentController(req, res);
+  it("should return correct JSON response on successful transaction", async () => {
+    // Arrange
+    const cart = [{ price: 10 }];
+    const nonce = "nonce123";
 
-      // Assert
-      expect(OrderModelMock).toHaveBeenCalledWith({
-        products: cart,
-        payment: result,
-        buyer: userId,
-      });
-    });
+    const { brainTreePaymentController } = await setupPaymentController();
 
-    it("should trigger order save operation on successful transaction", async () => {
-      // Arrange
-      const cart = [{ price: 10 }];
-      const nonce = "nonce123";
-      const result = { id: "txn-success" };
+    const req = { body: { nonce, cart }, user: { _id: "user123" } };
+    const res = makeRes();
 
-      const { brainTreePaymentController, saveMock } = await setupPaymentController({
-        saleImplementation: (payload, cb) => cb(null, result),
-      });
+    // Act
+    await brainTreePaymentController(req, res);
 
-      const req = { body: { nonce, cart }, user: { _id: "user123" }};
-      const res = makeRes();
-
-      // Act
-      await brainTreePaymentController(req, res);
-
-      // Assert
-      expect(saveMock).toHaveBeenCalledTimes(1);
-    });
-
-    it("should return correct JSON response on successful transaction", async () => {
-      // Arrange
-      const cart = [{ price: 10 }];
-      const nonce = "nonce123";
-
-      const { brainTreePaymentController } = await setupPaymentController();
-
-      const req = { body: { nonce, cart }, user: { _id: "user123" } };
-      const res = makeRes();
-
-      // Act
-      await brainTreePaymentController(req, res);
-
-      // Assert
-      expect(res.json).toHaveBeenCalledWith({ok: true});
-    });
+    // Assert
+    expect(res.json).toHaveBeenCalledWith({ok: true});
   });
 });
 
