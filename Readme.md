@@ -158,3 +158,16 @@ This project’s testing work was divided by component ownership and testing sco
    2. authController.js (order.authController.test.js)
    3. orderModel.js (orderModel.test.js)
    4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+
+### Fajar Ibnu Fatihan
+**Features unit tested:**
+   1. Authentication feature (Login, Register, Forgot Password)
+   2. Protected routes (JWT middleware, Admin check)
+
+**Source Files tested & unit test files created:**
+   1. authHelper.js (authHelper.test.js)
+   2. authMiddleware.js (authMiddleware.test.js)
+   3. authController.js (login.authController.test.js)
+   4. Login.js (Login.test.js)
+   5. Register.js (Register.test.js)
+   6. auth.js (auth.test.js)
