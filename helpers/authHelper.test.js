@@ -1,3 +1,5 @@
+// Fajar Ibnu Fatihan, A0314606L
+
 import { hashPassword, comparePassword } from "./authHelper";
 import { silenceConsole } from "../controllers/_tests_/utils.js";
 

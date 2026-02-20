@@ -1,3 +1,5 @@
+// Fajar Ibnu Fatihan, A0314606L
+
 import { registerController, loginController, forgotPasswordController, testController } from "../authController.js";
 import { silenceConsole, mockRes } from "./utils.js";
 import { hashPassword, comparePassword } from "../../helpers/authHelper.js";
@@ -57,7 +59,7 @@ describe('testing registerController', () => {
         req.body.name = "";
         await registerController(req, res);
         // uses "error" key instead of "message"
-        expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+        expect(res.send).toHaveBeenCalledWith({ message: "Name is Required" });    // Fajar Ibnu Fatihan, A0314606L
     });
 
     test('should return message when email is missing', async () => {
@@ -115,7 +117,7 @@ describe('testing registerController', () => {
         expect(res.send).toHaveBeenCalledWith(
             expect.objectContaining({
                 success: false,
-                message: "Errro in Registeration",
+                message: "Error in Registration",         // Fajar Ibnu Fatihan, A0314606L
                 error: expect.any(Error)
             })
         );
@@ -173,7 +175,7 @@ describe('testing loginController', () => {
         expect(res.status).toHaveBeenCalledWith(404);
         expect(res.send).toHaveBeenCalledWith({
             success: false,
-            message: "Email is not registerd"
+            message: "Email is not registered"      // Fajar Ibnu Fatihan, A0314606L
         })
     });
 
@@ -269,7 +271,7 @@ describe('testing for forgotPasswordController', () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
-            message: "Emai is required"
+            message: "Email is required"        // Fajar Ibnu Fatihan, A0314606L
         });
     });
 
