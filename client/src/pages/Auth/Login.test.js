@@ -1,3 +1,6 @@
+// Fajar Ibnu Fatihan, A0314606L
+// More unit tests are added to ensure the robustness of the code. 
+
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
@@ -111,7 +114,7 @@ describe('Login Component', () => {
         fireEvent.click(getByText('LOGIN'));
 
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
-        expect(toast.success).toHaveBeenCalledWith(undefined, {
+        expect(toast.success).toHaveBeenCalledWith("Login successful", {   // Fajar Ibnu Fatihan, A0314606L
             duration: 5000,
             icon: '🙏',
             style: {
@@ -140,6 +143,7 @@ describe('Login Component', () => {
         expect(toast.error).toHaveBeenCalledWith('Something went wrong');
     });
 
+    // Fajar Ibnu Fatihan, A0314606L
     it('should show toast notification error when email or password is invalid', async () => {
         axios.post.mockResolvedValueOnce({
             data: {
@@ -164,6 +168,7 @@ describe('Login Component', () => {
         expect(toast.error).toHaveBeenCalledWith("Invalid credentials");
     });
 
+    // Fajar Ibnu Fatihan, A0314606L
     it('should render forgot password and navigate user to forgot password page', () => {
         const { getByText } = render(
             <MemoryRouter initialEntries={['/login']}>

@@ -1,3 +1,6 @@
+// Fajar Ibnu Fatihan, A0314606L
+// More unit tests are added to ensure the robustness of the code. 
+
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
@@ -100,6 +103,7 @@ describe('Register Component', () => {
     expect(toast.error).toHaveBeenCalledWith('Something went wrong');
   });
 
+  // Fajar Ibnu Fatihan, A0314606L
   it('renders register form', () => {
     const { getByText, getByPlaceholderText } = render(
       <MemoryRouter initialEntries={['/register']}>
@@ -119,6 +123,7 @@ describe('Register Component', () => {
     expect(getByPlaceholderText('What is Your Favorite sports')).toBeInTheDocument();
   });
 
+  // Fajar Ibnu Fatihan, A0314606L
   it('register inputs form should be initially empty', () => {
     const { getByText, getByPlaceholderText } = render(
       <MemoryRouter initialEntries={['/register']}>
@@ -138,6 +143,7 @@ describe('Register Component', () => {
     expect(getByPlaceholderText('What is Your Favorite sports').value).toBe('');
   });
 
+  // Fajar Ibnu Fatihan, A0314606L
   it('should allow typing info into the register form', () => {
     const { getByText, getByPlaceholderText } = render(
       <MemoryRouter initialEntries={['/register']}>
@@ -163,6 +169,7 @@ describe('Register Component', () => {
     expect(getByPlaceholderText('What is Your Favorite sports').value).toBe('Pingpong');
   });
 
+  // Fajar Ibnu Fatihan, A0314606L
   it('should show toast notification error with error message from the server', async () => {
     axios.post.mockResolvedValueOnce({
       data: {

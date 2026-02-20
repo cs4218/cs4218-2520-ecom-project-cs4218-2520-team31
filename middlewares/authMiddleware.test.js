@@ -1,3 +1,5 @@
+// Fajar Ibnu Fatihan, A0314606L
+
 import JWT from "jsonwebtoken";
 import { requireSignIn, isAdmin } from "./authMiddleware.js";
 import userModel from "../models/userModel.js";
