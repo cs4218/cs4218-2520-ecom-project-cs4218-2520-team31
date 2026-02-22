@@ -1,180 +1,166 @@
 import React from "react";
-import { render, waitFor, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import axios from "axios";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import CategoryProduct from "./CategoryProduct";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 
 jest.mock("axios");
-
 jest.mock("../../components/Layout", () => {
-  return ({ children }) => <div data-testid="mock-layout">{children}</div>;
+  return ({ children }) => <div data-testid="layout">{children}</div>;
 });
-
-const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => {
-  const actual = jest.requireActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-    useParams: () => ({ slug: "phones" }),
-  };
-});
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useParams: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe("CategoryProduct Unit Tests", () => {
+  let navigateMock;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    navigateMock = jest.fn();
+    useNavigate.mockReturnValue(navigateMock);
+    useParams.mockReturnValue({ slug: "tests" });
   });
 
-  it("rendering Category page UI", () => {
-    const { getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    expect(getByText(/Category -/i)).toBeInTheDocument();
-  });
-
-  it("fetches category products and shows name + result count + products", async () => {
-    const apiRes = {
-      data: {
-        category: { name: "Phones" },
-        products: [
-          {
-            _id: "p1",
-            name: "iPhone 15",
-            slug: "iphone-15",
-            description: "Best phone ever",
-            price: 1999,
-          },
-          {
-            _id: "p2",
-            name: "Samsung S24",
-            slug: "s24",
-            description: "Good phone too",
-            price: 1500,
-          },
-        ],
-      },
+  it("fetches category products on mount when slug exists and renders category name + results count", async () => {
+    const apiResponse = {
+      category: { _id: "c1", name: "Tests" },
+      products: [
+        {
+          _id: "pid1",
+          name: "Test A",
+          slug: "test-a",
+          description: "A long description for test A to be cut off as a description",
+          price: 100,
+        },
+        {
+          _id: "pid2",
+          name: "Test B",
+          slug: "test-b",
+          description: "A long description for test B to be cut off as a description",
+          price: 200,
+        },
+      ],
     };
 
-    axios.get.mockResolvedValueOnce(apiRes);
-    const { findByText, getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    axios.get.mockResolvedValue({ data: apiResponse });
 
-    expect(await findByText("Category - Phones")).toBeInTheDocument();
-    await waitFor(() =>
+    render(<CategoryProduct />);
+
+    // Communication-based testing
+    await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith(
-        "/api/v1/product/product-category/phones"
-      )
-    );
-    expect(getByText("2 result found")).toBeInTheDocument();
+        "/api/v1/product/product-category/tests"
+      );
+    });
 
-    expect(getByText("iPhone 15")).toBeInTheDocument();
-    expect(getByText("Samsung S24")).toBeInTheDocument();
+    // Output-based testing
+    expect(await screen.findByText("Category - Tests")).toBeInTheDocument();
+    expect(await screen.findByText("2 result found")).toBeInTheDocument();
+
+    expect(await screen.findByText("Test A")).toBeInTheDocument();
+    expect(await screen.findByText("Test B")).toBeInTheDocument();
+
+    const imgs = screen.getAllByRole("img");
+    expect(imgs[0]).toHaveAttribute(
+      "src",
+      "/api/v1/product/product-photo/pid1"
+    );
+    expect(imgs[1]).toHaveAttribute(
+      "src",
+      "/api/v1/product/product-photo/pid2"
+    );
   });
 
-  it("shows 0 result found when category has no products", async () => {
-    const apiRes = {
+  it("renders 0 results when products array is empty", async () => {
+    axios.get.mockResolvedValue({
       data: {
-        category: { name: "Phones" },
+        category: { _id: "c2", name: "EmptyCategory" },
         products: [],
       },
-    };
-    axios.get.mockResolvedValueOnce(apiRes);
-    const { findByText, getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
-    expect(await findByText("Category - Phones")).toBeInTheDocument();
-    expect(getByText(/0 result found/i)).toBeInTheDocument();
+    });
+
+    render(<CategoryProduct />);
+
+    // Output-based testing
+    expect(await screen.findByText("Category - EmptyCategory")).toBeInTheDocument();
+    expect(await screen.findByText("0 result found")).toBeInTheDocument();
   });
-  it("renders product image src using product-photo endpoint and truncates description", async () => {
-    const longDesc =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ";
-    const expectedTrunc = `${longDesc.substring(0, 60)}...`;
-    const apiRes = {
+
+  it("navigates to /product/:slug when 'More Details' is clicked", async () => {
+    axios.get.mockResolvedValue({
       data: {
-        category: { name: "Phones" },
+        category: { _id: "c1", name: "Phones" },
         products: [
           {
-            _id: "p1",
-            name: "iPhone 15",
-            slug: "iphone-15",
-            description: longDesc,
-            price: 1999,
+            _id: "p10",
+            name: "Clickable Test",
+            slug: "clickable-test",
+            description: "This description is long enough it to get cut off as a description",
+            price: 500,
           },
         ],
       },
-    };
-    axios.get.mockResolvedValueOnce(apiRes);
-    const { findByText, getByAltText, getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
-    await findByText("Category - Phones");
-    await findByText("iPhone 15");
-    const img = getByAltText("iPhone 15");
-    expect(img).toHaveAttribute("src", "/api/v1/product/product-photo/p1");
-    expect(getByText(expectedTrunc)).toBeInTheDocument();
+    });
+
+    render(<CategoryProduct />);
+    const btn = await screen.findByRole("button", { name: "More Details" });
+    fireEvent.click(btn);
+
+    // Output-based testing (behaviour)
+    expect(navigateMock).toHaveBeenCalledWith("/product/clickable-test");
   });
 
-  it("navigate to product details", async () => {
-    const apiRes = {
+  it("does not call GET axios when params.slug is missing", async () => {
+    useParams.mockReturnValue({ slug: undefined });
+    render(<CategoryProduct />);
+
+    // Communication-based testing
+    expect(axios.get).not.toHaveBeenCalled();
+  });
+
+  it("handles axios failure gracefully without crashing", async () => {
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    axios.get.mockRejectedValue(new Error("network error"));
+
+    render(<CategoryProduct />);
+
+    // Output-based testing
+    expect(screen.getByTestId("layout")).toBeInTheDocument();
+
+    // Communication-based testing
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith(
+        "/api/v1/product/product-category/tests"
+      );
+      expect(logSpy).toHaveBeenCalled();
+    });
+
+    logSpy.mockRestore();
+  });
+
+  it("renders price formatted in USD currency format", async () => {
+    axios.get.mockResolvedValue({
       data: {
-        category: { name: "Phones" },
+        category: { _id: "c9", name: "FormatCategory" },
         products: [
           {
-            _id: "p1",
-            name: "iPhone 15",
-            slug: "iphone-15",
-            description: "Best phone ever",
-            price: 1999,
+            _id: "pid9",
+            name: "Dollar Item",
+            slug: "dollar-item",
+            description: "Long enough description for showcasing the formatting",
+            price: 1234,
           },
         ],
       },
-    };
+    });
 
-    axios.get.mockResolvedValueOnce(apiRes);
-    const { findByText, getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    render(<CategoryProduct />);
 
-    await findByText("Category - Phones");
-    await findByText("iPhone 15");
-    fireEvent.click(getByText("More Details"));
-    expect(mockNavigate).toHaveBeenCalledWith("/product/iphone-15");
-  });
-
-  it("handle API error gracefully (negative test)", async () => {
-    axios.get.mockRejectedValueOnce(new Error("Network error"));
-
-    const { getByText } = render(
-      <MemoryRouter initialEntries={["/category/phones"]}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
-    expect(getByText(/Category -/i)).toBeInTheDocument();
-    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    // Output-based testing
+    expect(await screen.findByText("Dollar Item")).toBeInTheDocument();
+    expect(await screen.findByText("$1,234.00")).toBeInTheDocument();
   });
 });
