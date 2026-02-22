@@ -1,10 +1,10 @@
+// Amanda Quek Yan Ling, A0277779Y
 import { buildReq, buildRes, expectStatusBeforeSend } from "./testUtils.js";
 import productModel from "../../models/productModel.js";
 import { productPhotoController } from "../productController.js";
 
 jest.mock("../../models/productModel.js");
 
-//Amanda Quek Yan Ling, A0277779Y
 describe("productPhotoController", () => {
   let req, res;
 

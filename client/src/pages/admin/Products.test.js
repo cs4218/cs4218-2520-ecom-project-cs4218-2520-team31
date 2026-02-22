@@ -1,3 +1,4 @@
+// Amanda Quek Yan Ling, A0277779Y
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import Products from "./Products";

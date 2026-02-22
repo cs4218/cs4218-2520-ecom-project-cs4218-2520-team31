@@ -1,3 +1,4 @@
+// Amanda Quek Yan Ling, A0277779Y
 import mongoose from "mongoose";
 import Product from "./productModel.js";
 
