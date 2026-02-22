@@ -34,10 +34,14 @@ export const createProductController = async (req, res) => {
         return res.status(500).send({ error: "Category is Required" });
       case !quantity:
         return res.status(500).send({ error: "Quantity is Required" });
+      //Amanda Quek Yan Ling, A0277779Y  
+      case !photo:
+        return res.status(500).send({ error: "Photo is Required" });
       case photo && photo.size > 1000000:
         return res
           .status(500)
-          .send({ error: "photo is Required and should be less then 1mb" });
+          //Amanda Quek Yan Ling, A0277779Y  
+          .send({ error: "Photo should be less than 1MB" });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -56,7 +60,8 @@ export const createProductController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error in crearing product",
+      //Amanda Quek Yan Ling, A0277779Y  
+      message: "Error in creating product",
     });
   }
 };
@@ -73,21 +78,33 @@ export const getProductController = async (req, res) => {
     res.status(200).send({
       success: true,
       counTotal: products.length,
-      message: "ALlProducts ",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "All Products",
       products,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Erorr in getting products",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error in getting products",
       error: error.message,
     });
   }
 };
+
 // get single product
 export const getSingleProductController = async (req, res) => {
   try {
+    //Amanda Quek Yan Ling, A0277779Y
+    const slug = req?.params?.slug;
+    if (!slug || (typeof slug === "string" && slug.trim() === "")) {
+      return res.status(400).send({
+        success: false,
+        message: "Missing input required",
+      });
+    }
+
     const product = await productModel
       .findOne({ slug: req.params.slug })
       .select("-photo")
@@ -101,7 +118,8 @@ export const getSingleProductController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Eror while getitng single product",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error while getting single product",
       error,
     });
   }
@@ -110,6 +128,15 @@ export const getSingleProductController = async (req, res) => {
 // get photo
 export const productPhotoController = async (req, res) => {
   try {
+    //Amanda Quek Yan Ling, A0277779Y
+    const pid = req?.params?.pid;
+    if (!pid || (typeof pid === "string" && pid.trim() === "")) {
+      return res.status(400).send({
+        success: false,
+        message: "Missing input required",
+      });
+    }
+
     const product = await productModel.findById(req.params.pid).select("photo");
     if (product.photo.data) {
       res.set("Content-type", product.photo.contentType);
@@ -119,7 +146,8 @@ export const productPhotoController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Erorr while getting photo",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error while getting photo",
       error,
     });
   }
@@ -127,11 +155,20 @@ export const productPhotoController = async (req, res) => {
 
 //delete controller
 export const deleteProductController = async (req, res) => {
+  //Amanda Quek Yan Ling, A0277779Y
+  if (!req.params.pid || req.params.pid.trim() === "") {
+    return res.status(400).send({
+      success: false,
+      message: "Missing input required"
+    });
+  }
+
   try {
     await productModel.findByIdAndDelete(req.params.pid).select("-photo");
     res.status(200).send({
       success: true,
-      message: "Product Deleted successfully",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Product deleted successfully",
     });
   } catch (error) {
     console.log(error);
@@ -161,10 +198,14 @@ export const updateProductController = async (req, res) => {
         return res.status(500).send({ error: "Category is Required" });
       case !quantity:
         return res.status(500).send({ error: "Quantity is Required" });
+      //Amanda Quek Yan Ling, A0277779Y  
+      case !photo:
+        return res.status(500).send({ error: "Photo is Required" });
       case photo && photo.size > 1000000:
         return res
           .status(500)
-          .send({ error: "photo is Required and should be less then 1mb" });
+          //Amanda Quek Yan Ling, A0277779Y  
+          .send({ error: "Photo should be less then 1MB" });
     }
 
     const products = await productModel.findByIdAndUpdate(
@@ -187,7 +228,8 @@ export const updateProductController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error in Updte product",
+      //Amanda Quek Yan Ling, A0277779Y  
+      message: "Error in updating product",
     });
   }
 };
@@ -208,7 +250,8 @@ export const productFiltersController = async (req, res) => {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "Error WHile Filtering Products",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error while filtering products",
       error,
     });
   }
@@ -236,7 +279,26 @@ export const productCountController = async (req, res) => {
 export const productListController = async (req, res) => {
   try {
     const perPage = 6;
-    const page = req.params.page ? req.params.page : 1;
+
+    //Amanda Quek Yan Ling, A0277779Y
+    const tempPage = req?.params?.page;
+    if (!(tempPage === undefined || tempPage === null)) {
+      if (typeof tempPage === "string" && tempPage.trim() === "") {
+        return res.status(400).send({
+          success: false,
+          message: "Error while fetching products per page",
+        });
+      }
+      const pageNum = Number(tempPage);
+      if (Number.isNaN(pageNum)) {
+        return res.status(400).send({
+          success: false,
+          message: "Error while fetching products per page",
+        });
+      }
+    }
+    const page = (tempPage === undefined || tempPage === null) ? 1 : Number(tempPage);
+
     const products = await productModel
       .find({})
       .select("-photo")
@@ -251,7 +313,8 @@ export const productListController = async (req, res) => {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "error in per page ctrl",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error while fetching products per page",
       error,
     });
   }
@@ -259,6 +322,15 @@ export const productListController = async (req, res) => {
 
 // search product
 export const searchProductController = async (req, res) => {
+  //Amanda Quek Yan Ling, A0277779Y
+  const keyword = req?.params?.keyword;
+  if (!keyword || (typeof keyword === "string" && keyword.trim() === "")) {
+    return res.status(400).send({
+      success: false,
+      message: "Error in searching product",
+    });
+  }
+
   try {
     const { keyword } = req.params;
     const resutls = await productModel
@@ -274,7 +346,8 @@ export const searchProductController = async (req, res) => {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "Error In Search Product API",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error in searching product",
       error,
     });
   }
@@ -282,6 +355,15 @@ export const searchProductController = async (req, res) => {
 
 // similar products
 export const realtedProductController = async (req, res) => {
+  //Amanda Quek Yan Ling, A0277779Y
+  const { pid, cid } = req.params;
+  if (!pid || !cid || pid.trim?.() === "" || cid.trim?.() === "") {
+    return res.status(400).send({
+      success: false,
+      message: "Error in getting related product",
+    });
+  }
+
   try {
     const { pid, cid } = req.params;
     const products = await productModel
@@ -300,7 +382,8 @@ export const realtedProductController = async (req, res) => {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "error while geting related product",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error in getting related product",
       error,
     });
   }
@@ -308,6 +391,15 @@ export const realtedProductController = async (req, res) => {
 
 // get prdocyst by catgory
 export const productCategoryController = async (req, res) => {
+  //Amanda Quek Yan Ling, A0277779Y
+  const input = req?.params?.slug;
+  if (!input || (typeof input === "string" && input.trim() === "")) {
+    return res.status(400).send({
+      success: false,
+      message: "Error in getting products",
+    });
+  }
+
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
     const products = await productModel.find({ category }).populate("category");
@@ -321,7 +413,8 @@ export const productCategoryController = async (req, res) => {
     res.status(400).send({
       success: false,
       error,
-      message: "Error While Getting products",
+      //Amanda Quek Yan Ling, A0277779Y
+      message: "Error in getting products",
     });
   }
 };

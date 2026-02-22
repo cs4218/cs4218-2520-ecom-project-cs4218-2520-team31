@@ -3,3 +3,9 @@ node_modules
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+.env
+coverage/
+.scannerwork/
+context.md
+my_sprint_plan.md
+notes.md

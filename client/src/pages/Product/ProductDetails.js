@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Layout from "./../components/Layout";
+import Layout from "../../components/Layout";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import "../styles/ProductDetailsStyles.css";
+import "../../styles/ProductDetailsStyles.css";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -21,7 +21,14 @@ const ProductDetails = () => {
         `/api/v1/product/get-product/${params.slug}`
       );
       setProduct(data?.product);
-      getSimilarProduct(data?.product._id, data?.product.category._id);
+
+      // Amanda Quek Yan Ling, A0277779Y
+      const pid = data?.product?._id;
+      const cid = data?.product?.category?._id;
+      if (pid && cid) {
+        getSimilarProduct(pid, cid);
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -37,14 +44,21 @@ const ProductDetails = () => {
       console.log(error);
     }
   };
+
+  // Amanda Quek Yan Ling, A0277779Y
+  const productPhotoSrc = product?._id
+    ? `/api/v1/product/product-photo/${product._id}`
+    : "/images/a1.png";
+
   return (
     <Layout>
       <div className="row container product-details">
         <div className="col-md-6">
+          {/* Amanda Quek Yan Ling, A0277779Y */}
           <img
-            src={`/api/v1/product/product-photo/${product._id}`}
+            src={productPhotoSrc}
             className="card-img-top"
-            alt={product.name}
+            alt={product?.name || "product"}
             height="300"
             width={"350px"}
           />
@@ -62,7 +76,8 @@ const ProductDetails = () => {
             })}
           </h6>
           <h6>Category : {product?.category?.name}</h6>
-          <button class="btn btn-secondary ms-1">ADD TO CART</button>
+          {/* Amanda Quek Yan Ling, A0277779Y */}
+          <button className="btn btn-secondary ms-1">ADD TO CART</button>
         </div>
       </div>
       <hr />
