@@ -1,70 +1,207 @@
-import { productPhotoController } from "../productController.js";
+// Amanda Quek Yan Ling, A0277779Y
+import { buildReq, buildRes, expectStatusBeforeSend } from "./testUtils.js";
 import productModel from "../../models/productModel.js";
-import { mockRes, silenceConsole } from "./utils.js";
+import { productPhotoController } from "../productController.js";
 
 jest.mock("../../models/productModel.js");
 
 describe("productPhotoController", () => {
-  let restoreConsole;
+  let req, res;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    restoreConsole = silenceConsole();
+    req = buildReq();
+    res = buildRes();
+    res.set = jest.fn().mockReturnThis();
   });
 
-  afterEach(() => restoreConsole());
+  // ==========================================================
+  // Main Flow
+  // ==========================================================
+  describe("Main Flow", () => {
+    it("should return photo when pid is valid and photo exists", async () => {
+      req = buildReq({ params: { pid: "pid1" } });
+      const buffer = Buffer.from("photo-bytes");
+      const mockProduct = {
+        photo: {
+          data: buffer,
+          contentType: "image/jpeg",
+        },
+      };
+      const selectMock = jest.fn().mockResolvedValue(mockProduct);
+      productModel.findById.mockReturnValue({ select: selectMock });
 
-  it("returns 200 with image buffer + sets content-type if photo exists", async () => {
-    const req = { params: { pid: "p1" } };
-    const res = mockRes();
+      await productPhotoController(req, res);
 
-    const photoBuffer = Buffer.from("fakeimage");
-    const exec = jest.fn().mockResolvedValue({
-      photo: { data: photoBuffer, contentType: "image/png" },
+      // Output based check
+      expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(buffer);
+
+      expectStatusBeforeSend(res);
+
+      // Communication-Based Check
+      expect(productModel.findById).toHaveBeenCalledWith("pid1");
+      expect(selectMock).toHaveBeenCalledWith("photo");
     });
-
-    productModel.findById.mockReturnValue({ select: exec });
-
-    await productPhotoController(req, res);
-
-    expect(productModel.findById).toHaveBeenCalledWith("p1");
-    expect(res.set).toHaveBeenCalledWith("Content-type", "image/png");
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.send).toHaveBeenCalledWith(photoBuffer);
   });
 
-  it("does not send photo if photo.data is missing", async () => {
-    const req = { params: { pid: "p1" } };
-    const res = mockRes();
+  // ==========================================================
+  // Input Validation - Invalid
+  // ==========================================================
+  describe("Input Validation - Invalid", () => {
+    it("should return 400 when pid is missing", async () => {
+      req = buildReq({ params: {} });
 
-    const exec = jest.fn().mockResolvedValue({
-      photo: { data: null, contentType: "image/png" },
-    });
+      await productPhotoController(req, res);
 
-    productModel.findById.mockReturnValue({ select: exec });
-
-    await productPhotoController(req, res);
-
-    expect(res.status).not.toHaveBeenCalledWith(200);
-    expect(res.send).not.toHaveBeenCalled();
-  });
-
-  it("returns 500 on error", async () => {
-    const req = { params: { pid: "p1" } };
-    const res = mockRes();
-
-    productModel.findById.mockImplementation(() => {
-      throw new Error("DB fail");
-    });
-
-    await productPhotoController(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Erorr while getting photo",
-      })
-    );
+        message: "Missing input required",
+      });
+
+      expectStatusBeforeSend(res);
+
+      expect(productModel.findById).not.toHaveBeenCalled();
+    });
+
+    it("should return 400 when pid is blank", async () => {
+      req = buildReq({ params: { pid: "   " } });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Missing input required",
+      });
+
+      expectStatusBeforeSend(res);
+
+      // Communication-Based Check
+      expect(productModel.findById).not.toHaveBeenCalled();
+    });
+  });
+
+  // ==========================================================
+  // Input Validation - Valid
+  // ==========================================================
+  describe("Input Validation - Valid", () => {
+    it("should accept valid pid and query database", async () => {
+      req = buildReq({ params: { pid: "valid-pid" } });
+
+      const buffer = Buffer.from("x");
+      const mockProduct = {
+        photo: { data: buffer, contentType: "image/png" },
+      };
+
+      const selectMock = jest.fn().mockResolvedValue(mockProduct);
+      productModel.findById.mockReturnValue({ select: selectMock });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(buffer);
+
+      expectStatusBeforeSend(res);
+
+      // Communication-Based Check
+      expect(productModel.findById).toHaveBeenCalledWith("valid-pid");
+    });
+  });
+
+  // ==========================================================
+  // Edge Cases
+  // ==========================================================
+  describe("Edge Cases", () => {
+    it("should not send response when photo is null", async () => {
+      req = buildReq({ params: { pid: "no-photo" } });
+
+      const mockProduct = {
+        photo: { data: null, contentType: "image/jpeg" },
+      };
+
+      const selectMock = jest.fn().mockResolvedValue(mockProduct);
+      productModel.findById.mockReturnValue({ select: selectMock });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.send).not.toHaveBeenCalled();
+
+      // Communication-Based Check
+      expect(productModel.findById).toHaveBeenCalledWith("no-photo");
+    });
+
+    it("should return 500 when product is null", async () => {
+      req = buildReq({ params: { pid: "not-found" } });
+
+      const selectMock = jest.fn().mockResolvedValue(null);
+      productModel.findById.mockReturnValue({ select: selectMock });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          message: "Error while getting photo",
+        })
+      );
+
+      expectStatusBeforeSend(res);
+    });
+  });
+
+  // ==========================================================
+  // Error Handling
+  // ==========================================================
+  describe("Error Handling", () => {
+    it("should return 500 when db throws error", async () => {
+      req = buildReq({ params: { pid: "pid1" } });
+
+      const selectMock = jest.fn().mockRejectedValue(new Error("DB error"));
+      productModel.findById.mockReturnValue({ select: selectMock });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          message: "Error while getting photo",
+        })
+      );
+
+      expectStatusBeforeSend(res);
+    });
+
+    it("should return 500 when db throws findById", async () => {
+      req = buildReq({ params: { pid: "pid1" } });
+
+      productModel.findById.mockImplementation(() => {
+        throw new Error("findById failed");
+      });
+
+      await productPhotoController(req, res);
+
+      // Output based check
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          message: "Error while getting photo",
+        })
+      );
+
+      expectStatusBeforeSend(res);
+    });
   });
 });

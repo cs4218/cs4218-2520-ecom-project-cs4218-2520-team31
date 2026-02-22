@@ -27,7 +27,8 @@ const CreateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      //Amanda Quek Yan Ling, A0277779Y
+      toast.error("Something went wrong in getting catgeory");
     }
   };
 
@@ -39,6 +40,12 @@ const CreateProduct = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
+      //Amanda Quek Yan Ling, A0277779Y
+      if (!category) {
+        toast.error("Category is required");
+        return;
+      }
+
       const productData = new FormData();
       productData.append("name", name);
       productData.append("description", description);
@@ -46,15 +53,17 @@ const CreateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.post(
+      //Amanda Quek Yan Ling, A0277779Y
+      const { data } = await axios.post(
         "/api/v1/product/create-product",
         productData
       );
+      //Amanda Quek Yan Ling, A0277779Y
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Created Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error(data?.message);
       }
     } catch (error) {
       console.log(error);

@@ -1,5 +1,59 @@
 # CS4218 Project - Virtual Vault
 
+## Team Workload
+
+This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
+
+### Brenna Lauren Tan
+**Features unit tested:**
+   1. Order feature
+   2. Payment feature
+
+**Source Files tested & unit test files created:**
+   1. Order.js (Orders.test.js)
+   2. authController.js (order.authController.test.js)
+   3. orderModel.js (orderModel.test.js)
+   4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+
+### Fajar Ibnu Fatihan
+**Features unit tested:**
+   1. Authentication feature (Login, Register, Forgot Password)
+   2. Protected routes (JWT middleware, Admin check)
+
+**Source Files tested & unit test files created:**
+   1. authHelper.js (authHelper.test.js)
+   2. authMiddleware.js (authMiddleware.test.js)
+   3. authController.js (login.authController.test.js)
+   4. Login.js (Login.test.js)
+   5. Register.js (Register.test.js)
+   6. auth.js (auth.test.js)
+
+### Amanda Quek Yan Ling
+**Features unit tested:**
+   1. Product features
+   2. Admin Product features
+
+**Source Files tested & unit test files created:**
+   1. productController.js (product.getProductController.test.js, 
+                              product.getSingleProductController.test.js, 
+                              product.PhotoController.test.js, 
+                              product.productFiltersController.test.js, 
+                              product.productCountController.test.js, 
+                              product.productListController.test.js, 
+                              product.searchProductController.test.js, 
+                              product.relatedProductController.test.js, 
+                              product.productCategoryController.test.js, 
+                              product.createProductController.test.js, 
+                              product.deleteProductController.test.js, 
+                              product.updateProductController.test.js)
+   2. ProductDetails.js (ProductDetails.test.js)
+   3. CategoryProduct.js (CategoryProduct.test.js)
+   4. admin/Products.js (admin/Products.test.js)
+   5. admin/UpdateProducts.js (admin/UpdateProducts.test.js)
+   6. admin/CreateProducts.js (admin/CreateProducts.test.js)
+   7. productModel.js (productModel.test.js)
+
+
 ## 1. Project Introduction
 
 Virtual Vault is a full-stack MERN (MongoDB, Express.js, React.js, Node.js) e-commerce website, offering seamless connectivity and user-friendly features. The platform provides a robust framework for online shopping. The website is designed to adapt to evolving business needs and can be efficiently extended.
@@ -144,30 +198,3 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
-## 6. Team Workload
-
-This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
-
-### Brenna Lauren Tan
-**Features unit tested:**
-   1. Order feature
-   2. Payment feature
-
-**Source Files tested & unit test files created:**
-   1. Order.js (Orders.test.js)
-   2. authController.js (order.authController.test.js)
-   3. orderModel.js (orderModel.test.js)
-   4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
-
-### Fajar Ibnu Fatihan
-**Features unit tested:**
-   1. Authentication feature (Login, Register, Forgot Password)
-   2. Protected routes (JWT middleware, Admin check)
-
-**Source Files tested & unit test files created:**
-   1. authHelper.js (authHelper.test.js)
-   2. authMiddleware.js (authMiddleware.test.js)
-   3. authController.js (login.authController.test.js)
-   4. Login.js (Login.test.js)
-   5. Register.js (Register.test.js)
-   6. auth.js (auth.test.js)

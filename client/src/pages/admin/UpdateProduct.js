@@ -26,14 +26,14 @@ const UpdateProduct = () => {
       const { data } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
-      setName(data.product.name);
-      setId(data.product._id);
-      setDescription(data.product.description);
-      setPrice(data.product.price);
-      setPrice(data.product.price);
-      setQuantity(data.product.quantity);
-      setShipping(data.product.shipping);
-      setCategory(data.product.category._id);
+      //Amanda Quek Yan Ling, A0277779Y
+      setName(data?.product?.name || "");
+      setId(data?.product?._id || "");
+      setDescription(data?.product?.description || "");
+      setPrice(data?.product?.price || "");
+      setQuantity(data?.product?.quantity || "");
+      setShipping(data?.product?.shipping || false);
+      setCategory(data?.product?.category?._id || "");
     } catch (error) {
       console.log(error);
     }
@@ -51,7 +51,8 @@ const UpdateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      //Amanda Quek Yan Ling, A0277779Y
+      toast.error("Something went wrong in getting catgeory");
     }
   };
 
@@ -59,7 +60,7 @@ const UpdateProduct = () => {
     getAllCategory();
   }, []);
 
-  //create product function
+  //update product function
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -68,17 +69,21 @@ const UpdateProduct = () => {
       productData.append("description", description);
       productData.append("price", price);
       productData.append("quantity", quantity);
-      photo && productData.append("photo", photo);
+      //Amanda Quek Yan Ling, A0277779Y
+      if (photo) productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.put(
+
+      //Amanda Quek Yan Ling, A0277779Y
+      const { data } = await axios.put(
         `/api/v1/product/update-product/${id}`,
         productData
       );
+      //Amanda Quek Yan Ling, A0277779Y
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Updated Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error(data?.message);
       }
     } catch (error) {
       console.log(error);
@@ -89,12 +94,14 @@ const UpdateProduct = () => {
   //delete a product
   const handleDelete = async () => {
     try {
-      let answer = window.prompt("Are You Sure want to delete this product ? ");
+      //Amanda Quek Yan Ling, A0277779Y
+      let answer = window.prompt("Are you sure you want to delete this product?");
       if (!answer) return;
       const { data } = await axios.delete(
         `/api/v1/product/delete-product/${id}`
       );
-      toast.success("Product DEleted Succfully");
+      //Amanda Quek Yan Ling, A0277779Y
+      toast.success("Product Deleted Successfully");
       navigate("/dashboard/admin/products");
     } catch (error) {
       console.log(error);
