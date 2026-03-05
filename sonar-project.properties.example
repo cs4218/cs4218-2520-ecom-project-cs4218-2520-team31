@@ -1,6 +1,7 @@
 # SonarQube server settings
 sonar.host.url=http://localhost:9000
-sonar.token=squ_f57fcc9e0bf567cc9112e394cace81ec485ac2be
+sonar.token=[FILL IN YOUR SONARQUBE TOKEN]
+
 
 # Project identification
 sonar.projectKey=econ
