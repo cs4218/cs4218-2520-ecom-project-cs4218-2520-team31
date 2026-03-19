@@ -1,5 +1,22 @@
 import request from "supertest";
 import app from "../../app.js";
+import {
+  connectMemoryDb,
+  clearMemoryDb,
+  closeMemoryDb,
+} from "../../tests/memoryDB.js";
+
+beforeAll(async () => {
+  await connectMemoryDb();
+});
+
+afterEach(async () => {
+  await clearMemoryDb();
+});
+
+afterAll(async () => {
+  await closeMemoryDb();
+});
 
 describe("Smoke test", () => {
   it("GET / returns 200", async () => {
