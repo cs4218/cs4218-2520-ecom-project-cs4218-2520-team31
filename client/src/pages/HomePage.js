@@ -86,12 +86,13 @@ const HomePage = () => {
     }
     setChecked(all);
   };
+  // Amanda Quek Yan Ling, A0277779Y
   useEffect(() => {
-    if (!checked.length || !radio.length) getAllProducts();
-  }, [checked.length, radio.length]);
-
-  useEffect(() => {
-    if (checked.length || radio.length) filterProduct();
+    if (checked.length || radio.length) {
+      filterProduct();
+    } else {
+      getAllProducts();
+    }
   }, [checked, radio]);
 
   //get filterd product
@@ -102,10 +103,25 @@ const HomePage = () => {
         radio,
       });
       setProducts(data?.products);
+      // Amanda Quek Yan Ling, A0277779Y
+      setTotal(data?.products.length);
     } catch (error) {
       console.log(error);
     }
   };
+
+  // Amanda Quek Yan Ling, A0277779Y
+  const handleResetFilters = async () => {
+    try {
+      setChecked([]);
+      setRadio([]);
+      setPage(1);
+      await getAllProducts();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Layout title={"ALL Products - Best offers "}>
       {/* banner image */}
@@ -114,16 +130,17 @@ const HomePage = () => {
         className="banner-img"
         alt="bannerimage"
         width={"100%"}
+        data-testid="homepage-banner"
       />
-      {/* banner image */}
-      <div className="container-fluid row mt-3 home-page">
-        <div className="col-md-3 filters">
+      <div className="container-fluid row mt-3 home-page" data-testid="homepage">
+        <div className="col-md-3 filters" data-testid="filters-panel">
           <h4 className="text-center">Filter By Category</h4>
-          <div className="d-flex flex-column">
+          <div className="d-flex flex-column" data-testid="category-filters">
             {categories?.map((c) => (
               <Checkbox
                 key={c._id}
                 onChange={(e) => handleFilter(e.target.checked, c._id)}
+                data-testid={`category-filter-${c.slug || c._id}`}
               >
                 {c.name}
               </Checkbox>
@@ -131,56 +148,86 @@ const HomePage = () => {
           </div>
           {/* price filter */}
           <h4 className="text-center mt-4">Filter By Price</h4>
-          <div className="d-flex flex-column">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
+          <div className="d-flex flex-column" data-testid="price-filters">
+            <Radio.Group
+              value={radio}
+              onChange={(e) => setRadio(e.target.value)}
+              data-testid="price-filter-group"
+            >
               {Prices?.map((p) => (
                 <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
+                  <Radio
+                    value={p.array}
+                    data-testid={`price-filter-${p._id}`}
+                  >
+                    {p.name}
+                  </Radio>
                 </div>
               ))}
             </Radio.Group>
           </div>
+          {/* Amanda Quek Yan Ling, A0277779Y */}
           <div className="d-flex flex-column">
             <button
               className="btn btn-danger"
-              onClick={() => window.location.reload()}
+              data-testid="reset-filters-btn"
+              onClick={handleResetFilters}
             >
               RESET FILTERS
             </button>
           </div>
         </div>
-        <div className="col-md-9 ">
+
+        <div className="col-md-9" data-testid="products-section">
           <h1 className="text-center">All Products</h1>
-          <div className="d-flex flex-wrap">
+          <div className="d-flex flex-wrap" data-testid="product-grid">
             {products?.map((p) => (
-              <div className="card m-2" key={p._id}>
+              <div
+                className="card m-2"
+                key={p._id}
+                data-testid={`product-card-${p.slug}`}
+              >
                 <img
                   src={`/api/v1/product/product-photo/${p._id}`}
                   className="card-img-top"
                   alt={p.name}
+                  data-testid={`product-image-${p.slug}`}
                 />
                 <div className="card-body">
                   <div className="card-name-price">
-                    <h5 className="card-title">{p.name}</h5>
-                    <h5 className="card-title card-price">
+                    <h5
+                      className="card-title"
+                      data-testid={`product-name-${p.slug}`}
+                    >
+                      {p.name}
+                    </h5>
+                    <h5
+                      className="card-title card-price"
+                      data-testid={`product-price-${p.slug}`}
+                    >
                       {p.price.toLocaleString("en-US", {
                         style: "currency",
                         currency: "USD",
                       })}
                     </h5>
                   </div>
-                  <p className="card-text ">
+                  <p
+                    className="card-text"
+                    data-testid={`product-description-${p.slug}`}
+                  >
                     {p.description.substring(0, 60)}...
                   </p>
                   <div className="card-name-price">
                     <button
                       className="btn btn-info ms-1"
+                      data-testid={`more-details-${p.slug}`}
                       onClick={() => navigate(`/product/${p.slug}`)}
                     >
                       More Details
                     </button>
                     <button
                       className="btn btn-dark ms-1"
+                      data-testid={`add-to-cart-${p.slug}`}
                       onClick={() => {
                         setCart([...cart, p]);
                         localStorage.setItem(
@@ -198,9 +245,10 @@ const HomePage = () => {
             ))}
           </div>
           <div className="m-2 p-3">
-            {products && products.length < total && (
+            {/* {products && products.length < total && (
               <button
                 className="btn loadmore"
+                data-testid="load-more-btn"
                 onClick={(e) => {
                   e.preventDefault();
                   setPage(page + 1);
@@ -215,7 +263,7 @@ const HomePage = () => {
                   </>
                 )}
               </button>
-            )}
+            )} */}
           </div>
         </div>
       </div>
