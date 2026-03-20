@@ -5,6 +5,11 @@ module.exports = {
   // when testing backend
   testEnvironment: "node",
 
+
+  // setup environment
+  setupFiles: ["<rootDir>/tests/setupEnv.js"],
+
+
   // which test to run
   testMatch: [
     "<rootDir>/controllers/**/*.test.js",
