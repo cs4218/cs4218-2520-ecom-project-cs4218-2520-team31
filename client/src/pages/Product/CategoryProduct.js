@@ -26,35 +26,56 @@ const CategoryProduct = () => {
 
   return (
     <Layout>
-      <div className="container mt-3 category">
-        <h4 className="text-center">Category - {category?.name}</h4>
-        <h6 className="text-center">{products?.length} result found </h6>
+      <div className="container mt-3 category" data-testid="category-page">
+        <h4 className="text-center" data-testid="category-heading">
+          Category - {category?.name}
+        </h4>
+        <h6 className="text-center" data-testid="category-result-count">
+          {products?.length} result found
+        </h6>
         <div className="row">
           <div className="col-md-9 offset-1">
-            <div className="d-flex flex-wrap">
+            <div className="d-flex flex-wrap" data-testid="category-product-grid">
               {products?.map((p) => (
-                <div className="card m-2" key={p._id}>
+                <div
+                  className="card m-2"
+                  key={p._id}
+                  data-testid={`category-product-card-${p.slug}`}
+                >
                   <img
                     src={`/api/v1/product/product-photo/${p._id}`}
                     className="card-img-top"
                     alt={p.name}
+                    data-testid={`category-product-image-${p.slug}`}
                   />
                   <div className="card-body">
                     <div className="card-name-price">
-                      <h5 className="card-title">{p.name}</h5>
-                      <h5 className="card-title card-price">
+                      <h5
+                        className="card-title"
+                        data-testid={`category-product-name-${p.slug}`}
+                      >
+                        {p.name}
+                      </h5>
+                      <h5
+                        className="card-title card-price"
+                        data-testid={`category-product-price-${p.slug}`}
+                      >
                         {p.price.toLocaleString("en-US", {
                           style: "currency",
                           currency: "USD",
                         })}
                       </h5>
                     </div>
-                    <p className="card-text ">
+                    <p
+                      className="card-text"
+                      data-testid={`category-product-description-${p.slug}`}
+                    >
                       {p.description.substring(0, 60)}...
                     </p>
                     <div className="card-name-price">
                       <button
                         className="btn btn-info ms-1"
+                        data-testid={`category-more-details-${p.slug}`}
                         onClick={() => navigate(`/product/${p.slug}`)}
                       >
                         More Details

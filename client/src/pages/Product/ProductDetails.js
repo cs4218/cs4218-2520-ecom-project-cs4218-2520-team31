@@ -7,32 +7,50 @@ import "../../styles/ProductDetailsStyles.css";
 const ProductDetails = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [notFound, setNotFound] = useState(false);
 
   //initalp details
   useEffect(() => {
     if (params?.slug) getProduct();
   }, [params?.slug]);
+
   //getProduct
   const getProduct = async () => {
     try {
       const { data } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
-      setProduct(data?.product);
+      const fetchedProduct = data?.product ?? null;
+      setProduct(fetchedProduct);
+
+      if (!fetchedProduct) {
+        setNotFound(true);
+        setRelatedProducts([]);
+        return;
+      }
+
+      setNotFound(false);
 
       // Amanda Quek Yan Ling, A0277779Y
-      const pid = data?.product?._id;
-      const cid = data?.product?.category?._id;
+      const pid = fetchedProduct?._id;
+      const cid = fetchedProduct?.category?._id;
+
       if (pid && cid) {
         getSimilarProduct(pid, cid);
+      } else {
+        setRelatedProducts([]);
       }
 
     } catch (error) {
       console.log(error);
+      setProduct(null);
+      setNotFound(true);
+      setRelatedProducts([]);
     }
   };
+
   //get similar product
   const getSimilarProduct = async (pid, cid) => {
     try {
@@ -42,6 +60,7 @@ const ProductDetails = () => {
       setRelatedProducts(data?.products);
     } catch (error) {
       console.log(error);
+      setRelatedProducts([]);
     }
   };
 
@@ -50,9 +69,36 @@ const ProductDetails = () => {
     ? `/api/v1/product/product-photo/${product._id}`
     : "/images/a1.png";
 
+  // Amanda Quek Yan Ling, A0277779Y
+  if (notFound) {
+    return (
+      <Layout>
+        <div
+          className="container mt-5 text-center"
+          data-testid="product-not-found-page"
+        >
+          <h1 data-testid="product-not-found-heading">Product Not Found</h1>
+          <p data-testid="product-not-found-message">
+            The product you are looking for does not exist.
+          </p>
+          <button
+            className="btn btn-primary"
+            data-testid="back-home-btn"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="row container product-details">
+      <div
+        className="row container product-details"
+        data-testid="product-details-page"
+      >
         <div className="col-md-6">
           {/* Amanda Quek Yan Ling, A0277779Y */}
           <img
@@ -61,72 +107,97 @@ const ProductDetails = () => {
             alt={product?.name || "product"}
             height="300"
             width={"350px"}
+            data-testid="product-details-image"
           />
         </div>
         <div className="col-md-6 product-details-info">
-          <h1 className="text-center">Product Details</h1>
+          <h1 className="text-center" data-testid="product-details-heading">
+            Product Details
+          </h1>
           <hr />
-          <h6>Name : {product.name}</h6>
-          <h6>Description : {product.description}</h6>
-          <h6>
+          {/* Amanda Quek Yan Ling, A0277779Y */}
+          <h6 data-testid="product-details-name">
+            Name : {product?.name}
+          </h6>
+          <h6 data-testid="product-details-description">
+            Description : {product?.description}
+          </h6>
+          <h6 data-testid="product-details-price">
             Price :
             {product?.price?.toLocaleString("en-US", {
               style: "currency",
               currency: "USD",
             })}
           </h6>
-          <h6>Category : {product?.category?.name}</h6>
           {/* Amanda Quek Yan Ling, A0277779Y */}
-          <button className="btn btn-secondary ms-1">ADD TO CART</button>
+          <h6 data-testid="product-details-category">
+            Category : {product?.category?.name}
+          </h6>
+          <button
+            className="btn btn-secondary ms-1"
+            data-testid="product-details-add-to-cart"
+          >
+            ADD TO CART
+          </button>
+
         </div>
       </div>
       <hr />
-      <div className="row container similar-products">
-        <h4>Similar Products ➡️</h4>
+      <div
+        className="row container similar-products"
+        data-testid="related-products-section"
+      >
+        <h4 data-testid="related-products-heading">Similar Products ➡️</h4>
         {relatedProducts.length < 1 && (
-          <p className="text-center">No Similar Products found</p>
+          <p className="text-center" data-testid="no-related-products">
+            No Similar Products found
+          </p>
         )}
-        <div className="d-flex flex-wrap">
+        <div className="d-flex flex-wrap" data-testid="related-products-grid">
           {relatedProducts?.map((p) => (
-            <div className="card m-2" key={p._id}>
+            <div
+              className="card m-2"
+              key={p._id}
+              data-testid={`related-product-card-${p.slug}`}
+            >
               <img
                 src={`/api/v1/product/product-photo/${p._id}`}
                 className="card-img-top"
                 alt={p.name}
+                data-testid={`related-product-image-${p.slug}`}
               />
               <div className="card-body">
                 <div className="card-name-price">
-                  <h5 className="card-title">{p.name}</h5>
-                  <h5 className="card-title card-price">
+                  <h5
+                    className="card-title"
+                    data-testid={`related-product-name-${p.slug}`}
+                  >
+                    {p.name}
+                  </h5>
+                  <h5
+                    className="card-title card-price"
+                    data-testid={`related-product-price-${p.slug}`}
+                  >
                     {p.price.toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",
                     })}
                   </h5>
                 </div>
-                <p className="card-text ">
+                <p
+                  className="card-text"
+                  data-testid={`related-product-description-${p.slug}`}
+                >
                   {p.description.substring(0, 60)}...
                 </p>
                 <div className="card-name-price">
                   <button
                     className="btn btn-info ms-1"
+                    data-testid={`related-more-details-${p.slug}`}
                     onClick={() => navigate(`/product/${p.slug}`)}
                   >
                     More Details
                   </button>
-                  {/* <button
-                  className="btn btn-dark ms-1"
-                  onClick={() => {
-                    setCart([...cart, p]);
-                    localStorage.setItem(
-                      "cart",
-                      JSON.stringify([...cart, p])
-                    );
-                    toast.success("Item Added to cart");
-                  }}
-                >
-                  ADD TO CART
-                </button> */}
                 </div>
               </div>
             </div>
