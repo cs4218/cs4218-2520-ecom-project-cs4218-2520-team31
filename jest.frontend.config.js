@@ -40,4 +40,5 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: ["<rootDir>/client/src/setupTests.js"],
+  coverageDirectory: "coverage/frontend",
 };

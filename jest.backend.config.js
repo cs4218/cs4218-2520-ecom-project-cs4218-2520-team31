@@ -7,7 +7,11 @@ module.exports = {
 
   // which test to run
   testMatch: [
-    "<rootDir>/controllers/_tests_/integration/search.test.js",
+    "<rootDir>/controllers/_tests_/integration/**/*.test.js",
+    "<rootDir>/controllers/**/*.test.js",
+    "<rootDir>/helpers/**/*.test.js",
+    "<rootDir>/middlewares/**/*.test.js",
+    "<rootDir>/models/*.test.js",
   ],
 
   // jest code coverage
@@ -25,4 +29,5 @@ module.exports = {
       functions: 100,
     },
   },
+  coverageDirectory: "coverage/backend",
 };
