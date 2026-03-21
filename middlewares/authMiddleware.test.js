@@ -20,7 +20,10 @@ describe('requireSignIn middleware', () => {
                 authorization: 'aaassssvvvbbbdddd1234567890qwertyuiopasdfghjklzxcvbnm'
             }
         };
-        res = {};
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+        };
         next = jest.fn();
         jest.clearAllMocks();
         restoreConsole = silenceConsole();
@@ -35,6 +38,8 @@ describe('requireSignIn middleware', () => {
         expect(JWT.verify).toHaveBeenCalledWith('aaassssvvvbbbdddd1234567890qwertyuiopasdfghjklzxcvbnm', process.env.JWT_SECRET);
         expect(req.user).toEqual(mockUser);
         expect(next).toHaveBeenCalled();
+        expect(res.status).not.toHaveBeenCalled();
+        expect(res.send).not.toHaveBeenCalled();
     });
 
     test('should not call next() if token is invalid', async () => {
@@ -46,6 +51,11 @@ describe('requireSignIn middleware', () => {
 
         expect(next).not.toHaveBeenCalled();
         expect(req.user).toBeUndefined();
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: 'Unauthorized',
+        })
     });
 
 });
