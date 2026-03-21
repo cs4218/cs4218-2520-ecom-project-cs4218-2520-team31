@@ -4,7 +4,7 @@ import {
   connectMemoryDb,
   clearMemoryDb,
   closeMemoryDb,
-} from "../../tests/memoryDB.js";
+} from "../../tests/setupMemoryDb.js";
 
 beforeAll(async () => {
   await connectMemoryDb();

@@ -2,15 +2,15 @@ import request from "supertest";
 import mongoose from "mongoose";
 import JWT from "jsonwebtoken";
 
-import app from "../../app.js";
-import orderModel from "../../models/orderModel.js";
-import userModel from "../../models/userModel.js";
+import app from "../../../app.js";
+import orderModel from "../../../models/orderModel.js";
+import userModel from "../../../models/userModel.js";
 
 import {
   connectMemoryDb,
   clearMemoryDb,
   closeMemoryDb,
-} from "../../tests/memoryDb.js";
+} from "../../../tests/setupMemoryDb.js";
 
 describe("Get Orders API", () => {
   beforeAll(async () => {

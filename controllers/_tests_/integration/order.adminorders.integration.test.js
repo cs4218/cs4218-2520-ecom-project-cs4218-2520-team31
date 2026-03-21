@@ -1,14 +1,14 @@
 import request from "supertest";
 import JWT from "jsonwebtoken";
 
-import app from "../../app.js";
-import userModel from "../../models/userModel.js";
-import orderModel from "../../models/orderModel.js";
+import app from "../../../app.js";
+import userModel from "../../../models/userModel.js";
+import orderModel from "../../../models/orderModel.js";
 import {
   connectMemoryDb,
   clearMemoryDb,
   closeMemoryDb,
-} from "../../tests/memoryDb.js";
+} from "../../../tests/setupMemoryDb.js";
 
 describe("Admin Orders API", () => {
   beforeAll(async () => {

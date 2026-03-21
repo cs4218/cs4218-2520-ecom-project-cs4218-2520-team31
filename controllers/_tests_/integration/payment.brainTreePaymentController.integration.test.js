@@ -1,13 +1,13 @@
 import request from "supertest";
 import JWT from "jsonwebtoken";
 import mongoose from "mongoose";
-import app from "../../app.js";
-import orderModel from "../../models/orderModel.js";
+import app from "../../../app.js";
+import orderModel from "../../../models/orderModel.js";
 import {
   connectMemoryDb,
   clearMemoryDb,
   closeMemoryDb,
-} from "../../tests/memoryDb.js";
+} from "../../../tests/setupMemoryDb.js";
 
 jest.mock("braintree", () => {
   const mockSale = jest.fn();

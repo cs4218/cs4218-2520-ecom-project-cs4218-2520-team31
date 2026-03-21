@@ -19,7 +19,7 @@ jest.mock("braintree", () => {
   };
 });
 
-import app from "../../app.js";
+import app from "../../../app.js";
 import braintree from "braintree";
 
 describe("Braintree Token API", () => {
