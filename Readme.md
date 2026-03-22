@@ -29,7 +29,7 @@ This project’s testing work was divided by component ownership and testing sco
    6. auth.js (auth.test.js)
 
 ### Amanda Quek Yan Ling
-**Features unit tested:**
+**Features unit tested: (MS1)**
    1. Product features
    2. Admin Product features
 
@@ -52,6 +52,23 @@ This project’s testing work was divided by component ownership and testing sco
    5. admin/UpdateProducts.js (admin/UpdateProducts.test.js)
    6. admin/CreateProducts.js (admin/CreateProducts.test.js)
    7. productModel.js (productModel.test.js)
+
+**Integration Tests (MS2)**
+   1. Category mapping → product retrieval (integration/categoryMapping.test.js)
+   2. Product filtering  (integration/filter.test.js)
+   3. Product photo handling  (integration/photo.test.js)
+   4. Product listing  (integration/productList.test.js)
+   5. Related products  (integration/related.test.js)
+   6. Product search  (integration/search.test.js)
+
+**UI Tests (MS2)**
+   1. Homepage → Product list → Product details (tests/product-list-details.spec.ts)
+   2. Categories → Category page → Product details (tests/product-details-from-category.spec.ts)
+   3. Homepage → Apply category filter → Product cards update (tests/product-filters.spec.ts)
+   4. Homepage → Add to cart (tests/add-to-cart.spec.ts)
+   5. Product details → Related products → Navigate to another product (tests/related-products.spec.ts)
+   6. Homepage → Search product (tests/product-search.spec.ts)
+   7. Product details → Product photo rendering (tests/product-photo.spec.ts)
 
 
 ## 1. Project Introduction
