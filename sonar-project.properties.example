@@ -15,7 +15,7 @@ sonar.sources=controllers,helpers,middlewares,client/src/pages,client/src/contex
 sonar.tests=controllers/_tests_,client/src/pages,client/src/context
 
 # Test files
-sonar.test.inclusions=**/*.test.js
+sonar.test.inclusions=controllers/_tests_/**,client/src/**/*.test.js
 
 # Files to be treated as not-source files
 sonar.exclusions=**/*.test.js
