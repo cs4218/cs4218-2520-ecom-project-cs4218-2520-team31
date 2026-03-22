@@ -1,3 +1,5 @@
+// This config is for running integration tests only via: npm run test:integration
+// Integration tests are also included in jest.backend.config.js (npm run test:backend)
 module.exports = {
     displayName: "integration",
     testEnvironment: "node",

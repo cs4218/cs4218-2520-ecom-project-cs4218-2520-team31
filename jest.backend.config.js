@@ -7,7 +7,7 @@ module.exports = {
 
 
   // setup environment
-  setupFiles: ["<rootDir>/tests/setupEnv.js"],
+  setupFiles: ["<rootDir>/controllers/_tests_/integration/setupEnv.js"],
 
 
   // which test to run
