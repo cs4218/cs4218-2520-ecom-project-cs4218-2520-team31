@@ -1,0 +1,156 @@
+// Brenna Lauren Tan Jia Ern, A0254710M
+
+import { test, expect } from "@playwright/test";
+import path from 'path';
+
+const TEST_PRODUCT = {
+  name: "Sonic Book",
+  description: "A random book",
+  image_name: "test_image.png",
+  price: "59.99",
+  quantity: "2",
+}
+
+const TEST_PRODUCT_2 = {
+  name: "Mario Book",
+  description: "Another random book",
+  image_name: "test_image_2.png",
+  price: "69.99",
+  quantity: "3",
+}
+
+test.describe("Admin Product Management Flow", () => {
+  test.setTimeout(30000);
+
+  test.beforeEach(async ({ page }) => {
+
+    // navigate to landing page
+    await page.goto('http://localhost:3000/');
+
+    // login as admin
+    await page.getByRole('link', { name: 'Login' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Email' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Email' }).fill(process.env.ADMIN_TEST_EMAIL!);
+    await page.getByRole('textbox', { name: 'Enter Your Password' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Password' }).fill(process.env.ADMIN_TEST_PASSWORD!);
+    await page.getByRole('button', { name: 'LOGIN' }).click();
+    await expect(page).toHaveURL("/");
+  });
+
+  test('admin can create new product', async ({ page }) => {
+
+    // navigate to admin create product page
+    await page.goto('http://localhost:3000/dashboard/admin/create-product');
+    await page.waitForLoadState("networkidle");
+
+    // select product category
+    await page.locator('div').filter({ hasText: /^Select a category$/ }).first().click();
+    await page.getByText('Book').nth(1).click();
+
+    // upload product picture
+    await page.getByText('Upload Photo').click();
+    await page.locator('input[name="photo"]').setInputFiles(path.join(__dirname, TEST_PRODUCT.image_name));
+
+    // fill product name
+    await page.getByRole('textbox', { name: 'write a name' }).click();
+    await page.getByRole('textbox', { name: 'write a name' }).fill(TEST_PRODUCT.name);
+
+    // fill product description
+    await page.getByRole('textbox', { name: 'write a description' }).click();
+    await page.getByRole('textbox', { name: 'write a description' }).fill(TEST_PRODUCT.description);
+
+    // fill product price
+    await page.getByPlaceholder('write a Price').click();
+    await page.getByPlaceholder('write a Price').fill(TEST_PRODUCT.price);
+
+    // fill product quantity
+    await page.getByPlaceholder('write a quantity').click();
+    await page.getByPlaceholder('write a quantity').fill(TEST_PRODUCT.quantity);
+
+    // fill product shipping option
+    await page.locator('#rc_select_1').click();
+    await page.getByText('Yes').click();
+
+    // click create product button
+    await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
+
+    // click products page button
+    await page.getByText('Products').nth(1).click();
+
+    // verify added item is listed in products page
+    const expectedProduct = page.locator('card m-2').filter({
+      hasText: TEST_PRODUCT.name,
+    });
+    expect(expectedProduct.isVisible());
+  });
+
+  test("admin can update existing product", async ({ page }) => {
+
+    // navigate to admin view products page
+    await page.goto('http://localhost:3000/dashboard/admin/products');
+    await page.waitForLoadState("networkidle");
+
+    await page.getByText(TEST_PRODUCT.name).first().click();
+
+    const pageTitle = page.locator('col-md-9').filter({
+      hasText: "Update Product",
+    });
+    expect(pageTitle.isVisible());
+
+    await page.getByText(TEST_PRODUCT.name).isVisible();
+    await page.waitForTimeout(500);
+
+    // upload product picture
+    await page.getByText('Upload Photo').click();
+    await page.locator('input[name="photo"]').setInputFiles(path.join(__dirname, TEST_PRODUCT_2.image_name));
+
+    // update product name
+    await page.getByRole('textbox', { name: 'write a name' }).click();
+    await page.getByRole('textbox', { name: 'write a name' }).fill(TEST_PRODUCT_2.name);
+
+    // update product description
+    await page.getByRole('textbox', { name: 'write a description' }).click();
+    await page.getByRole('textbox', { name: 'write a description' }).fill(TEST_PRODUCT_2.description);
+
+    // update product price
+    await page.getByPlaceholder('write a Price').click();
+    await page.getByPlaceholder('write a Price').fill(TEST_PRODUCT_2.price);
+
+    // update product quantity
+    await page.getByPlaceholder('write a quantity').click();
+    await page.getByPlaceholder('write a quantity').fill(TEST_PRODUCT_2.quantity);
+
+    // click update product button
+    await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+
+    // wait for site to stabilise
+    await page.waitForLoadState("networkidle");
+
+    // click products page button
+    await page.getByText('Products').nth(1).click();
+
+    // verify updated item is listed in products page
+    const expectedProduct = page.locator('card m-2').filter({
+      hasText: TEST_PRODUCT_2.name,
+    });
+    expect(expectedProduct.isVisible());
+
+    await page.goto('http://localhost:3000/dashboard/admin/products');
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(500);
+
+    // delete product to prevent database overloading
+    await page.getByText(TEST_PRODUCT_2.name).first().click();
+    expect(pageTitle.isVisible());
+
+    await page.getByText(TEST_PRODUCT_2.name).isVisible();
+
+    await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
+    await page.keyboard.type('yes');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(500);
+    await page.goto('http://localhost:3000/dashboard/admin/products');
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(500);
+  })
+});
