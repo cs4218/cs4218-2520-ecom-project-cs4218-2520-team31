@@ -240,7 +240,7 @@ describe("AuthController Component: User Order Retrieval Logic ", () => {
     await getAllOrdersController(req, res);
 
     // Assert
-    expect(query.sort).toHaveBeenCalledWith({ createdAt: "-1" });
+    expect(query.sort).toHaveBeenCalledWith({ createdAt: -1 });
   });
 });
 
