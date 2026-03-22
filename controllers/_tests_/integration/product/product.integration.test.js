@@ -211,7 +211,6 @@ describe("Admin Product Routes Integration", () => {
                 .field("price", "199.99")
                 .field("category", categoryId.toString())
                 .field("quantity", "20")
-                // Note: Bug #3 — controller had typo "less then", fixed to "less than"
                 .attach("photo", largePhoto, { filename: "large.jpg", contentType: "image/jpeg" });
 
             expect(res.status).toBe(500);

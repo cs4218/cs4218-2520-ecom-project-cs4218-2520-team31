@@ -64,12 +64,14 @@ describe("Auth Middleware Integration", () => {
             expect(res.body.ok).toBe(true);
         });
 
-        // NOTE: Known bug — requireSignIn catch block does not send a 401 response
-        // when the token is missing or invalid. The request hangs indefinitely.
-        // This is a defect in authMiddleware.js that should be fixed by adding:
-        // return res.status(401).send({ success: false, message: "Unauthorized" })
-        // in the catch block. Test skipped to avoid timeout.
-        it.todo("should return 401 when no token is provided (blocked by requireSignIn bug)");
+        it("should return 401 when no token is provided", async () => {
+            const res = await request(app)
+                .get("/api/v1/auth/user-auth");
+
+            expect(res.status).toBe(401);
+            expect(res.body.success).toBe(false);
+            expect(res.body.message).toBe("Unauthorized");
+        });
 
     });
 
