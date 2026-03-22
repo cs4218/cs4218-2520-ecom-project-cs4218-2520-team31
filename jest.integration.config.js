@@ -1,9 +1,9 @@
 module.exports = {
     displayName: "integration",
     testEnvironment: "node",
-    setupFiles: ["<rootDir>/tests/setupEnv.js"],
+    setupFiles: ["<rootDir>/controllers/_tests_/integration/setupEnv.js"],
     testMatch: [
-        "<rootDir>/tests/integration/**/*.integration.test.js"
+        "<rootDir>/controllers/_tests_/integration/**/*.integration.test.js"
     ],
     collectCoverage: true,
     collectCoverageFrom: [

@@ -4,10 +4,10 @@ import request from "supertest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import JWT from "jsonwebtoken";
-import app from "../../../app.js";
-import userModel from "../../../models/userModel.js";
-import productModel from "../../../models/productModel.js";
-import categoryModel from "../../../models/categoryModel.js";
+import app from "../../../../app.js";
+import userModel from "../../../../models/userModel.js";
+import productModel from "../../../../models/productModel.js";
+import categoryModel from "../../../../models/categoryModel.js";
 
 let mongod;
 let adminToken;
@@ -211,11 +211,11 @@ describe("Admin Product Routes Integration", () => {
                 .field("price", "199.99")
                 .field("category", categoryId.toString())
                 .field("quantity", "20")
-                // Note: controller has typo "less then" instead of "less than" (Bug #3)
+                // Note: Bug #3 — controller had typo "less then", fixed to "less than"
                 .attach("photo", largePhoto, { filename: "large.jpg", contentType: "image/jpeg" });
 
             expect(res.status).toBe(500);
-            expect(res.body.error).toBe("Photo should be less then 1MB");
+            expect(res.body.error).toBe("Photo should be less than 1MB");
         });
 
         it("should return 401 when user is not an admin on update", async () => {

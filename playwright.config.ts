@@ -1,5 +1,6 @@
 /* eslint-disable notice/notice */
 
+import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 
 /**

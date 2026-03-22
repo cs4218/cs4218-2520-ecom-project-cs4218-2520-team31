@@ -4,8 +4,8 @@ import request from "supertest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import JWT from "jsonwebtoken";
-import app from "../../../app.js";
-import userModel from "../../../models/userModel.js";
+import app from "../../../../app.js";
+import userModel from "../../../../models/userModel.js";
 
 let mongod;
 
