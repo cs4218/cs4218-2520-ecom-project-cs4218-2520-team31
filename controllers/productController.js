@@ -211,7 +211,7 @@ export const updateProductController = async (req, res) => {
         return res
           .status(500)
           //Amanda Quek Yan Ling, A0277779Y  
-          .send({ error: "Photo should be less then 1MB" });
+          .send({ error: "Photo should be less than 1MB" });
     }
 
     const products = await productModel.findByIdAndUpdate(
