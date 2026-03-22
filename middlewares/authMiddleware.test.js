@@ -20,7 +20,10 @@ describe('requireSignIn middleware', () => {
                 authorization: 'aaassssvvvbbbdddd1234567890qwertyuiopasdfghjklzxcvbnm'
             }
         };
-        res = {};
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+        };
         next = jest.fn();
         jest.clearAllMocks();
         restoreConsole = silenceConsole();
