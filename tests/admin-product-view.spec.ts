@@ -45,7 +45,8 @@ test.describe("Admin Product Management Flow", () => {
 
     // select product category
     await page.locator('div').filter({ hasText: /^Select a category$/ }).first().click();
-    await page.getByText('Book').nth(1).click();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
 
     // upload product picture
     await page.getByText('Upload Photo').click();
@@ -90,17 +91,18 @@ test.describe("Admin Product Management Flow", () => {
     await page.goto('http://localhost:3000/dashboard/admin/products');
     await page.waitForLoadState("networkidle");
 
+    // click test product 1
     await page.getByText(TEST_PRODUCT.name).first().click();
 
+    // wait until page has loaded
     const pageTitle = page.locator('col-md-9').filter({
       hasText: "Update Product",
     });
     expect(pageTitle.isVisible());
-
     await page.getByText(TEST_PRODUCT.name).isVisible();
     await page.waitForTimeout(500);
 
-    // upload product picture
+    // upload updated product picture
     await page.getByText('Upload Photo').click();
     await page.locator('input[name="photo"]').setInputFiles(path.join(__dirname, TEST_PRODUCT_2.image_name));
 
@@ -135,22 +137,33 @@ test.describe("Admin Product Management Flow", () => {
     });
     expect(expectedProduct.isVisible());
 
+    // go back to products page
     await page.goto('http://localhost:3000/dashboard/admin/products');
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(500);
 
-    // delete product to prevent database overloading
+    // click updated product (test product 2)
     await page.getByText(TEST_PRODUCT_2.name).first().click();
     expect(pageTitle.isVisible());
 
+    // wait for page to load
     await page.getByText(TEST_PRODUCT_2.name).isVisible();
+    await page.waitForTimeout(500);
 
+    // prepare delete prompt response
+    page.once('dialog', async (dialog) => {
+      expect(dialog.type()).toBe('prompt');
+      expect(dialog.message()).toMatch("Are you sure you want to delete this product?");
+      await dialog.accept('yes');
+    });
+
+    // click delete (prompt response fires immediately)
     await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
-    await page.keyboard.type('yes');
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(500);
-    await page.goto('http://localhost:3000/dashboard/admin/products');
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(500);
-  })
+
+    // wait to get redirected to products page
+    await page.waitForURL('**/dashboard/admin/products');
+
+    // verify that test product 2 has been deleted
+    await expect(page.getByText(TEST_PRODUCT_2.name)).toHaveCount(0);
+  });
 });
