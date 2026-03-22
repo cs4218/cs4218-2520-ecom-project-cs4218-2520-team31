@@ -5,15 +5,24 @@
 This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
 
 ### Brenna Lauren Tan
-**Features unit tested:**
-   1. Order feature
-   2. Payment feature
+**Unit Tests (MS1)**
 
-**Source Files tested & unit test files created:**
-   1. Order.js (Orders.test.js)
-   2. authController.js (order.authController.test.js)
-   3. orderModel.js (orderModel.test.js)
-   4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+Source files tested & unit test files created
+1. Order feature - Order.js (Orders.test.js)
+2. Order feature - authController.js (order.authController.test.js)
+3. Order feature - orderModel.js (orderModel.test.js)
+4. Payment feature - productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+
+**Integration Tests (MS2)**
+1. Braintree token generation (payment.braintreeTokenController.integration.test.js)
+2. Payment processing -> order creation (payment.brainTreePaymentController.integration.test.js)
+3. User orders retrieval with authentication (order.getOrdersController.integration.test.js)
+4. Admin orders retrieval and status update (order.adminOrders.integration.test.js)
+
+**Unit Tests (MS2)**
+1. Login -> Checkout/Pay -> Order appears in user orders (checkout-orders.spec.ts)
+2. Admin create product -> Product on product list (admin-product-view.spec.ts)
+3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
 
 ### Fajar Ibnu Fatihan
 **Features unit tested:**
