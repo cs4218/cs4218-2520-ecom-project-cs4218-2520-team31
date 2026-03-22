@@ -145,8 +145,8 @@ describe("Admin Category Routes Integration", () => {
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
-            // NOTE: Bug #5 — response key is `messsage` (triple-s), not `message`
-            expect(res.body.messsage).toBe("Category Updated Successfully");
+            // NOTE: Bug #5 — response key was `messsage` (triple-s), fixed to `message`
+            expect(res.body.message).toBe("Category Updated Successfully");
 
             // Verify updated in DB
             const updated = await categoryModel.findById(existing._id);
@@ -198,8 +198,8 @@ describe("Admin Category Routes Integration", () => {
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
-            // NOTE: Bug #6 — typo in message: "Categry" instead of "Category"
-            expect(res.body.message).toBe("Categry Deleted Successfully");
+            // NOTE: Bug #6 — typo in message was "Categry", fixed to "Category"
+            expect(res.body.message).toBe("Category Deleted Successfully");
 
             // Verify removed from DB
             const deleted = await categoryModel.findById(existing._id);

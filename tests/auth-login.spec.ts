@@ -23,7 +23,7 @@ test.describe("Login Flow", () => {
 
     await page.goto("/login");
 
-    await page.getByPlaceholder("Enter Your Email ").fill(TEST_USER.email);
+    await page.getByPlaceholder("Enter Your Email").fill(TEST_USER.email);
     await page.getByPlaceholder("Enter Your Password").fill(TEST_USER.password);
     await page.getByRole("button", { name: "LOGIN" }).click();
 

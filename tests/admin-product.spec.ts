@@ -9,7 +9,7 @@ test.describe("Admin Product Management", () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin via UI
     await page.goto("/login");
-    await page.getByPlaceholder("Enter Your Email ").fill(process.env.ADMIN_TEST_EMAIL!);
+    await page.getByPlaceholder("Enter Your Email").fill(process.env.ADMIN_TEST_EMAIL!);
     await page.getByPlaceholder("Enter Your Password").fill(process.env.ADMIN_TEST_PASSWORD!);
     await page.getByRole("button", { name: "LOGIN" }).click();
     await expect(page).toHaveURL("/");

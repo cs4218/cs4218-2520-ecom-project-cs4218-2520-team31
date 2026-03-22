@@ -23,7 +23,7 @@ test.describe("Authentication Error Handling", () => {
 
     await page.goto("/login");
 
-    await page.getByPlaceholder("Enter Your Email ").fill(TEST_USER.email);
+    await page.getByPlaceholder("Enter Your Email").fill(TEST_USER.email);
     await page.getByPlaceholder("Enter Your Password").fill("wrongpassword");
     await page.getByRole("button", { name: "LOGIN" }).click();
 
@@ -40,7 +40,7 @@ test.describe("Authentication Error Handling", () => {
       page.getByText(/redirecting to you in/i)
     ).toBeVisible();
 
-    // After countdown, should redirect to home page
-    await expect(page).toHaveURL("/", { timeout: 10000 });
+    // After countdown, should redirect to login page
+    await expect(page).toHaveURL("/login", { timeout: 10000 });
   });
 });
