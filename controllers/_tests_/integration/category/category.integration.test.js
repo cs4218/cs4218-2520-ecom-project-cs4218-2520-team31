@@ -125,10 +125,18 @@ describe("Admin Category Routes Integration", () => {
             expect(res.body.message).toBe("UnAuthorized Access");
         });
 
-        // NOTE: Bug #4 — catch block references `errro` (undefined variable), causing a
-        // ReferenceError if the catch block executes. The server error path is broken.
-        // See notes.md Bug #4 for details.
-        it.todo("should return 500 on database error (blocked by Bug #4: errro ReferenceError in catch block)");
+        it("should return 500 on database error", async () => {
+            jest.spyOn(categoryModel.prototype, "save").mockRejectedValueOnce(new Error("DB Error"));
+
+            const res = await request(app)
+                .post("/api/v1/category/create-category")
+                .set("Authorization", adminToken)
+                .send({ name: "Fail Category" });
+
+            expect(res.status).toBe(500);
+            expect(res.body.success).toBe(false);
+            expect(res.body.message).toBe("Error in Category");
+        });
 
     });
 
@@ -145,7 +153,6 @@ describe("Admin Category Routes Integration", () => {
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
-            // NOTE: Bug #5 — response key was `messsage` (triple-s), fixed to `message`
             expect(res.body.message).toBe("Category Updated Successfully");
 
             // Verify updated in DB
@@ -198,7 +205,6 @@ describe("Admin Category Routes Integration", () => {
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
-            // NOTE: Bug #6 — typo in message was "Categry", fixed to "Category"
             expect(res.body.message).toBe("Category Deleted Successfully");
 
             // Verify removed from DB
