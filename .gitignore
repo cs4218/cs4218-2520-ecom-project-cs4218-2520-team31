@@ -6,13 +6,7 @@ node_modules
 .env
 coverage/
 .scannerwork/
-context.md
-my_sprint_plan.md
-notes.md
 sonarqube_conf.txt
-sprint_plan_v2.md
-/cs4218_planning/
-reference_info.html
-/n8n/
 sonar-project.properties
 .claude/
+/notes/
