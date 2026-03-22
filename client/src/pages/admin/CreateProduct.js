@@ -53,6 +53,7 @@ const CreateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
+      productData.append("shipping", shipping);
       //Amanda Quek Yan Ling, A0277779Y
       const { data } = await axios.post(
         "/api/v1/product/create-product",
