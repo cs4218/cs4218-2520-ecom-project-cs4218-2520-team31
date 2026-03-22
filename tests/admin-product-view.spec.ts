@@ -75,6 +75,9 @@ test.describe("Admin Product Management Flow", () => {
     // click create product button
     await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
 
+    // wait to get redirected
+    await page.waitForURL('**/dashboard/admin/products');
+
     // click products page button
     await page.getByText('Products').nth(1).click();
 
@@ -129,7 +132,7 @@ test.describe("Admin Product Management Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // click products page button
-    await page.getByText('Products').nth(1).click();
+    await page.getByRole('link', { name: 'Products' }).click();
 
     // verify updated item is listed in products page
     const expectedProduct = page.locator('card m-2').filter({
@@ -137,10 +140,8 @@ test.describe("Admin Product Management Flow", () => {
     });
     expect(expectedProduct.isVisible());
 
-    // go back to products page
-    await page.goto('http://localhost:3000/dashboard/admin/products');
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(500);
+    // wait to be redirected back to products page
+    await page.waitForURL('**/dashboard/admin/products');
 
     // click updated product (test product 2)
     await page.getByText(TEST_PRODUCT_2.name).first().click();

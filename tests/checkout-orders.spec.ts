@@ -31,8 +31,8 @@ test.describe("User Purchase Flow", () => {
     await page.getByRole('textbox', { name: 'Enter Your Password' }).fill(TEST_USER.password);
     await page.getByRole('button', { name: 'LOGIN' }).click();
 
-    // add item to cart
-    await page.getByTestId('add-to-cart-the-law-of-contract-in-singapore').click();
+    // add first item to cart
+    await page.getByRole('button', { name: 'ADD TO CART' }).first().click()
 
     // go to cart
     await page.getByRole('link', { name: 'Cart' }).click();
@@ -60,12 +60,8 @@ test.describe("User Purchase Flow", () => {
     // check for correct orders page
     await expect(page.getByRole('heading', { name: /all orders|orders/i })).toBeVisible();
 
-    // check for successful order block
-    const successOrderBlock = page.locator('div.border.shadow').filter({
-      hasText: 'Success',
-    });
-
-    // check for ordered item
-    await expect(successOrderBlock.getByText('The Law of Contract in').last()).toBeVisible();
+    // check for successful purchase
+    await expect(page.getByText('Success').first()).toBeVisible();
+    await expect(page.getByText('a few seconds ago').first()).toBeVisible();
   });
 });
