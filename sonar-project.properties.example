@@ -1,0 +1,26 @@
+# SonarQube server settings
+sonar.host.url=http://localhost:9000
+sonar.token=[FILL IN YOUR SONARQUBE TOKEN]
+
+
+# Project identification
+sonar.projectKey=econ
+sonar.projectName=econ
+sonar.projectVersion=1.0
+
+# Project sources
+sonar.sources=controllers,helpers,middlewares,client/src/pages,client/src/context,models
+
+# Location of test files (following Suggested Testing Scope)
+sonar.tests=controllers/_tests_,client/src/pages,client/src/context
+
+# Test files
+sonar.test.inclusions=controllers/_tests_/**,client/src/**/*.test.js
+
+# Files to be treated as not-source files
+sonar.exclusions=**/*.test.js
+
+# Files to be excluded from coverage
+
+# Location of coverage report paths
+sonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info,coverage/backend/lcov.info

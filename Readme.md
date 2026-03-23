@@ -5,15 +5,24 @@
 This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
 
 ### Brenna Lauren Tan
-**Features unit tested:**
-   1. Order feature
-   2. Payment feature
+**Unit Tests (MS1)**
 
-**Source Files tested & unit test files created:**
-   1. Order.js (Orders.test.js)
-   2. authController.js (order.authController.test.js)
-   3. orderModel.js (orderModel.test.js)
-   4. productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+Source files tested & unit test files created
+1. Order feature - Order.js (Orders.test.js)
+2. Order feature - authController.js (order.authController.test.js)
+3. Order feature - orderModel.js (orderModel.test.js)
+4. Payment feature - productController.js (payment.brainTreePaymentController.test.js, payment.braintreeTokenController.test.js)
+
+**Integration Tests (MS2)**
+1. Braintree token generation (payment.braintreeTokenController.integration.test.js)
+2. Payment processing -> order creation (payment.brainTreePaymentController.integration.test.js)
+3. User orders retrieval with authentication (order.getOrdersController.integration.test.js)
+4. Admin orders retrieval and status update (order.adminOrders.integration.test.js)
+
+**UI Tests (MS2)**
+1. Login -> Checkout/Pay -> Order appears in user orders (checkout-orders.spec.ts)
+2. Admin create product -> Product on product list (admin-product-view.spec.ts)
+3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
 
 ### Fajar Ibnu Fatihan
 **Features unit tested:**
@@ -28,8 +37,23 @@ This project’s testing work was divided by component ownership and testing sco
    5. Register.js (Register.test.js)
    6. auth.js (auth.test.js)
 
+**Integration Tests (MS2)**
+   1. User login authentication (integration/auth/login.integration.test.js)
+   2. User registration (integration/auth/register.integration.test.js)
+   3. User profile update (integration/auth/profile.integration.test.js)
+   4. Auth middleware and protected routes (integration/auth/authMiddleware.integration.test.js)
+   5. Category CRUD operations (integration/category/category.integration.test.js)
+   6. Product CRUD operations (integration/product/product.integration.test.js)
+
+**UI Tests (MS2)**
+   1. User registration flow (tests/auth-register.spec.ts)
+   2. User login flow (tests/auth-login.spec.ts)
+   3. Authentication error handling and redirects (tests/auth-error.spec.ts)
+   4. Admin product create and update (tests/admin-product.spec.ts)
+   5. Admin category CRUD management (tests/admin-category.spec.ts)
+
 ### Amanda Quek Yan Ling
-**Features unit tested:**
+**Features unit tested: (MS1)**
    1. Product features
    2. Admin Product features
 
@@ -52,6 +76,23 @@ This project’s testing work was divided by component ownership and testing sco
    5. admin/UpdateProducts.js (admin/UpdateProducts.test.js)
    6. admin/CreateProducts.js (admin/CreateProducts.test.js)
    7. productModel.js (productModel.test.js)
+
+**Integration Tests (MS2)**
+   1. Category mapping → product retrieval (integration/categoryMapping.test.js)
+   2. Product filtering  (integration/filter.test.js)
+   3. Product photo handling  (integration/photo.test.js)
+   4. Product listing  (integration/productList.test.js)
+   5. Related products  (integration/related.test.js)
+   6. Product search  (integration/search.test.js)
+
+**UI Tests (MS2)**
+   1. Homepage → Product list → Product details (tests/product-list-details.spec.ts)
+   2. Categories → Category page → Product details (tests/product-details-from-category.spec.ts)
+   3. Homepage → Apply category filter → Product cards update (tests/product-filters.spec.ts)
+   4. Homepage → Add to cart (tests/add-to-cart.spec.ts)
+   5. Product details → Related products → Navigate to another product (tests/related-products.spec.ts)
+   6. Homepage → Search product (tests/product-search.spec.ts)
+   7. Product details → Product photo rendering (tests/product-photo.spec.ts)
 
 
 ## 1. Project Introduction

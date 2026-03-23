@@ -6,6 +6,7 @@ node_modules
 .env
 coverage/
 .scannerwork/
-context.md
-my_sprint_plan.md
-notes.md
+sonarqube_conf.txt
+sonar-project.properties
+.claude/
+/notes/

@@ -118,7 +118,7 @@ describe("productPhotoController", () => {
   // Edge Cases
   // ==========================================================
   describe("Edge Cases", () => {
-    it("should not send response when photo is null", async () => {
+    it("should return 404 when photo is null", async () => {
       req = buildReq({ params: { pid: "no-photo" } });
 
       const mockProduct = {
@@ -131,14 +131,19 @@ describe("productPhotoController", () => {
       await productPhotoController(req, res);
 
       // Output based check
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.send).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Photo not found",
+      });
+
+      expectStatusBeforeSend(res);
 
       // Communication-Based Check
       expect(productModel.findById).toHaveBeenCalledWith("no-photo");
     });
 
-    it("should return 500 when product is null", async () => {
+    it("should return 404 when product is null", async () => {
       req = buildReq({ params: { pid: "not-found" } });
 
       const selectMock = jest.fn().mockResolvedValue(null);
@@ -147,15 +152,16 @@ describe("productPhotoController", () => {
       await productPhotoController(req, res);
 
       // Output based check
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: false,
-          message: "Error while getting photo",
-        })
-      );
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Photo not found",
+      });
 
       expectStatusBeforeSend(res);
+
+      // Communication-Based Check
+      expect(productModel.findById).toHaveBeenCalledWith("not-found");
     });
   });
 

@@ -299,7 +299,7 @@ describe("updateProductController", () => {
       // Output based check
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
-        error: "Photo should be less then 1MB",
+        error: "Photo should be less than 1MB",
       });
 
       expectStatusBeforeSend(res);

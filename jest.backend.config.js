@@ -5,8 +5,14 @@ module.exports = {
   // when testing backend
   testEnvironment: "node",
 
+
+  // setup environment
+  setupFiles: ["<rootDir>/controllers/_tests_/integration/setupEnv.js"],
+
+
   // which test to run
   testMatch: [
+    "<rootDir>/controllers/_tests_/integration/**/*.test.js",
     "<rootDir>/controllers/**/*.test.js",
     "<rootDir>/helpers/**/*.test.js",
     "<rootDir>/middlewares/**/*.test.js",
@@ -28,4 +34,5 @@ module.exports = {
       functions: 100,
     },
   },
+  coverageDirectory: "coverage/backend",
 };

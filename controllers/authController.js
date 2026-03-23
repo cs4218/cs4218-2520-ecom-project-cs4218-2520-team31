@@ -121,13 +121,13 @@ export const forgotPasswordController = async (req, res) => {
   try {
     const { email, answer, newPassword } = req.body;
     if (!email) {
-      res.status(400).send({ message: "Email is required" });     // Fajar Ibnu Fatihan, A0314606L
+      return res.status(400).send({ message: "Email is required" });     // Fajar Ibnu Fatihan, A0314606L
     }
     if (!answer) {
-      res.status(400).send({ message: "answer is required" });
+      return res.status(400).send({ message: "answer is required" });
     }
     if (!newPassword) {
-      res.status(400).send({ message: "New Password is required" });
+      return res.status(400).send({ message: "New Password is required" });
     }
     //check
     const user = await userModel.findOne({ email, answer });
@@ -223,7 +223,8 @@ export const getAllOrdersController = async (req, res) => {
       .find({})
       .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: "-1" });
+      // Brenna Lauren Tan Jia Ern, A0254710M
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     console.log(error);
