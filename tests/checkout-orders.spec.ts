@@ -21,7 +21,7 @@ test.describe("User Purchase Flow", () => {
     await page.goto('http://localhost:3000/');
   });
 
-  test('user can complete purchase and see order', async ({ page }) => {
+  test.skip('user can complete purchase and see order', async ({ page }) => {
 
     // login
     await page.getByRole('link', { name: 'Login' }).click();

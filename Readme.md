@@ -19,7 +19,7 @@ Source files tested & unit test files created
 3. User orders retrieval with authentication (order.getOrdersController.integration.test.js)
 4. Admin orders retrieval and status update (order.adminOrders.integration.test.js)
 
-**Unit Tests (MS2)**
+**UI Tests (MS2)**
 1. Login -> Checkout/Pay -> Order appears in user orders (checkout-orders.spec.ts)
 2. Admin create product -> Product on product list (admin-product-view.spec.ts)
 3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
@@ -36,6 +36,21 @@ Source files tested & unit test files created
    4. Login.js (Login.test.js)
    5. Register.js (Register.test.js)
    6. auth.js (auth.test.js)
+
+**Integration Tests (MS2)**
+   1. User login authentication (integration/auth/login.integration.test.js)
+   2. User registration (integration/auth/register.integration.test.js)
+   3. User profile update (integration/auth/profile.integration.test.js)
+   4. Auth middleware and protected routes (integration/auth/authMiddleware.integration.test.js)
+   5. Category CRUD operations (integration/category/category.integration.test.js)
+   6. Product CRUD operations (integration/product/product.integration.test.js)
+
+**UI Tests (MS2)**
+   1. User registration flow (tests/auth-register.spec.ts)
+   2. User login flow (tests/auth-login.spec.ts)
+   3. Authentication error handling and redirects (tests/auth-error.spec.ts)
+   4. Admin product create and update (tests/admin-product.spec.ts)
+   5. Admin category CRUD management (tests/admin-category.spec.ts)
 
 ### Amanda Quek Yan Ling
 **Features unit tested: (MS1)**

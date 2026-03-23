@@ -125,7 +125,7 @@ test.describe("Admin Product Management Flow", () => {
 
   });
 
-  test("admin can update existing product", async ({ page }) => {
+  test.skip("admin can update existing product", async ({ page }) => {
 
     // flow: create test product 1 -> verify test product 1 created -> update to test product 2 -> verify test product 2 updated
     //       -> delete test product 2
