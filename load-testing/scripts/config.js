@@ -1,6 +1,6 @@
 // Brenna Lauren Tan Jia Ern, A0254710M
 
-export const BASE_URL = 'http://localhost:3000';
+export const BASE_URL = 'http://localhost:6060';
 
 export const defaultStages = [
   { duration: '30s', target: 5 },   // ramp up to 5 users
