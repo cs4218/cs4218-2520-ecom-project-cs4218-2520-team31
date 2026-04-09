@@ -4,7 +4,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { BASE_URL, createOptions, lightStages, mediumStages, heavyStages } from './config.js';
 
-export const options = createOptions(mediumStages);
+export const options = createOptions(heavyStages);
 
 export default function () {
   const categoryRes = http.get(`${BASE_URL}/api/v1/category/get-category`);
