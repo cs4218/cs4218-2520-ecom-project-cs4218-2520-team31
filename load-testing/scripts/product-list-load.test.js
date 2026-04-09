@@ -2,9 +2,9 @@
 
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { BASE_URL, createOptions } from './config.js';
+import { BASE_URL, createOptions, lightStages, mediumStages, heavyStages } from './config.js';
 
-export const options = createOptions();
+export const options = createOptions(mediumStages);
 
 export default function () {
   const res = http.get(`${BASE_URL}/api/v1/product/product-list/1`);
