@@ -1,3 +1,27 @@
+# Low Load Test Summary
+Updated based on tests carried out on 10 Apr 2026 at 3.20pm
+
+## Product List
+- Avg response time: 9.04ms
+- p95 response time: 12.59ms
+- Failure rate: 0.00%
+- Requests: 310
+- Throughput: 3.82 requests/sec
+
+## Product Search/Filter
+- Avg response time: 7.75ms
+- p95 response time: 10.3ms
+- Failure rate: 0.00%
+- Requests: 616
+- Throughput: 7.65 requests/sec
+
+## Product Details
+- Avg response time: 11.32ms
+- p95 response time: 15.82ms
+- Failure rate: 0.00%
+- Requests: 610
+- Throughput: 7.55 requests/sec
+
 # Baseline Load Test Summary
 Updated based on tests carried out on 9 Apr 2026 at 4.45pm
 
