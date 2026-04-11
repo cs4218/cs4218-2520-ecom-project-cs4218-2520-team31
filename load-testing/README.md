@@ -15,6 +15,12 @@ PRODUCT SEARCH LOAD TESTING:
 PRODUCT DETAILS LOAD TESTING:
 - k6 run load-testing/scripts/product-details-load.test.js | Tee-Object -FilePath "load-testing/results/low-load/product-details-light.txt"
 
+PRODUCT COUNT LOAD TESTING:
+- k6 run load-testing/scripts/product-count-load.test.js | Tee-Object -FilePath "load-testing/results/low-load/product-count-light.txt"
+
+CATEGORY LOAD TESTING:
+- k6 run load-testing/scripts/category-load.test.js | Tee-Object -FilePath "load-testing/results/low-load/category-light.txt"
+
 #### Baseline Load Testing
 
 To run k6 tests and write output to the baseline text files, change load to "mediumStages" in the respective script file and run the following:
@@ -28,6 +34,12 @@ PRODUCT SEARCH LOAD TESTING:
 PRODUCT DETAILS LOAD TESTING:
 - k6 run load-testing/scripts/product-details-load.test.js | Tee-Object -FilePath "load-testing/results/baseline/product-details-baseline.txt"
 
+PRODUCT COUNT LOAD TESTING:
+- k6 run load-testing/scripts/product-count-load.test.js | Tee-Object -FilePath "load-testing/results/baseline/product-count-baseline.txt"
+
+CATEGORY LOAD TESTING:
+- k6 run load-testing/scripts/category-load.test.js | Tee-Object -FilePath "load-testing/results/baseline/category-baseline.txt"
+
 #### Heavy Load Testing
 
 To run k6 tests and write output to the heavy (load) text files, change load to "heavyStages" in the respective script file and run the following:
@@ -40,6 +52,12 @@ PRODUCT SEARCH LOAD TESTING:
 
 PRODUCT DETAILS LOAD TESTING:
 - k6 run load-testing/scripts/product-details-load.test.js | Tee-Object -FilePath "load-testing/results/high-load/product-details-heavy.txt"
+
+PRODUCT COUNT LOAD TESTING:
+- k6 run load-testing/scripts/product-count-load.test.js | Tee-Object -FilePath "load-testing/results/high-load/product-count-heavy.txt"
+
+CATEGORY LOAD TESTING:
+- k6 run load-testing/scripts/category-load.test.js | Tee-Object -FilePath "load-testing/results/high-load/category-heavy.txt"
 
 ---
 

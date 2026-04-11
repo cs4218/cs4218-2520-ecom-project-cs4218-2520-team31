@@ -1,5 +1,5 @@
 # Low Load Test Summary
-Updated based on tests carried out on 10 Apr 2026 at 3.20pm
+Updated based on tests carried out on 11 Apr 2026 at 3.30pm
 
 ## Product List
 - Avg response time: 9.04ms
@@ -22,8 +22,22 @@ Updated based on tests carried out on 10 Apr 2026 at 3.20pm
 - Requests: 610
 - Throughput: 7.55 requests/sec
 
+## Product Count
+- Avg response time: 7.4ms
+- p95 response time: 9.83ms
+- Failure rate: 0.00%
+- Requests: 310
+- Throughput: 3.84 requests/sec
+
+## Category
+- Avg response time: 7.64ms
+- p95 response time: 10.65ms
+- Failure rate: 0.00%
+- Requests: 310
+- Throughput: 3.84 requests/sec
+
 # Baseline Load Test Summary
-Updated based on tests carried out on 9 Apr 2026 at 4.45pm
+Updated based on tests carried out on 11 Apr 2026 at 3.30pm
 
 ## Product List
 - Avg response time: 7.48ms
@@ -46,9 +60,23 @@ Updated based on tests carried out on 9 Apr 2026 at 4.45pm
 - Requests: 5304
 - Throughput: 25.20 requests/sec
 
+## Product Count
+- Avg response time: 6.47ms
+- p95 response time: 8.79ms
+- Failure rate: 0.00%
+- Requests: 2691
+- Throughput: 12.78 requests/sec
+
+## Category
+- Avg response time: 7.36ms
+- p95 response time: 9.9ms
+- Failure rate: 0.00%
+- Requests: 2688
+- Throughput: 12.75 requests/sec
+
 # High Load Test Summary
 
-Updated based on tests carried out on 9 Apr 2026 at 5.10pm
+Updated based on tests carried out on 11 Apr 2026 at 3.30pm
 
 ## Product List
 - Avg response time: 8.52ms
@@ -70,3 +98,17 @@ Updated based on tests carried out on 9 Apr 2026 at 5.10pm
 - Failure rate: 0.00%
 - Requests: 12456
 - Throughput: 49.60 requests/sec
+
+## Product Count
+- Avg response time: 7.29ms
+- p95 response time: 11.09ms
+- Failure rate: 0.00%
+- Requests: 6275
+- Throughput: 29.79 requests/sec
+
+## Category
+- Avg response time: 6.87ms
+- p95 response time: 10.03ms
+- Failure rate: 0.00%
+- Requests: 6280
+- Throughput: 29.81 requests/sec
