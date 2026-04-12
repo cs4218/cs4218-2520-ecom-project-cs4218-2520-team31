@@ -131,6 +131,44 @@ Scenarios tested & security test scripts created
    6. Homepage → Search product (tests/product-search.spec.ts)
    7. Product details → Product photo rendering (tests/product-photo.spec.ts)
 
+**NFR Tests (MS3) - Recovery Tests**
+Scenarios tested & load test scripts created
+1. Product API recovery (product-recovery-test.jmx)
+Backend failure during product listing
+Product search during backend downtime
+Category retrieval during service failure
+Product category requests during backend restart
+
+2.  Database recovery testing (used product-recovery-test.jmx) 
+MongoDB shutdown during access to Product APIs
+Continuous API requests during database downtime
+Database restart and system stabilisation
+
+3. Authentication recovery (authentication-recovery-test.jmx)
+Login requests during backend failure
+Register requests during backend failure
+Authentication service restart recovery
+Continuous login requests during recovery
+
+**Test setup & configuration (MS3)**
+- Apache JMeter recovery testing configuration
+- Thread Group for continuous request execution
+- HTTP Request Defaults for API configuration
+- HTTP Header Manager for authentication headers
+- Summary Report listener for performance metrics
+- Aggregate Report listener for statistical analysis
+- Graph Results listener for recovery visualisation
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- Set up n8n locally to automate AI-assisted testing workflow
+- Configured workflow to retrieve GitHub repository data using GitHub API
+- Integrated Google Gemini API within n8n workflow
+- Generated AI comments to review code changes and suggest potential issues
+- Used AI feedback to identify edge cases and improve test coverage
+
+- Used GitHub Copilot for Test Development
+
+Used GitHub Copilot while writing unit tests (MS1)
 
 ## 1. Project Introduction
 
