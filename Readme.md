@@ -25,6 +25,7 @@ Source files tested & unit test files created
 3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
 
 **NFR Tests (MS3) - Load Tests**
+
 Scenarios tested & load test scripts created
 1. Product listing (product-list-load.test.js)
 2. Product search/filter (product-search-load.test.js)
@@ -72,6 +73,7 @@ Scenarios tested & load test scripts created
    5. Admin category CRUD management (tests/admin-category.spec.ts)
 
 **NFR Tests (MS3) — Security Tests**
+
 Scenarios tested & security test scripts created
 1. Authentication security — JWT tampering, forged tokens, algorithm "none" attack, malformed headers (nfr_tests/security-tests/auth-security.js)
 2. Authorization & access control — regular user vs admin routes, unauthenticated access, positive controls (nfr_tests/security-tests/authz-security.js)
