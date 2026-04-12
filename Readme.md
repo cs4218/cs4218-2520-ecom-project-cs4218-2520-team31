@@ -65,14 +65,21 @@ Scenarios tested & load test scripts created
    4. Admin product create and update (tests/admin-product.spec.ts)
    5. Admin category CRUD management (tests/admin-category.spec.ts)
 
-**Non-Functional Testing — Security Testing (MS3)**
-   - Tool: Grafana k6 (penetration testing)
-   - Test type: Security testing (white-box penetration testing)
-   1. Authentication security — JWT tampering, forged tokens, algorithm "none" attack, malformed headers (security-tests/auth-security.js)
-   2. Authorization & access control — regular user vs admin routes, unauthenticated access, positive controls (security-tests/authz-security.js)
-   3. NoSQL injection — operator injection on login, forgot-password, product filters, role injection on register (security-tests/injection-security.js)
-   4. Sensitive data exposure — password hash leakage, stack trace leakage, X-Powered-By header, security answer leakage (security-tests/data-exposure-security.js)
-   5. Shared config and helpers (security-tests/config.js, security-tests/helpers.js)
+**NFR Tests (MS3) — Security Tests**
+Scenarios tested & security test scripts created
+1. Authentication security — JWT tampering, forged tokens, algorithm "none" attack, malformed headers (nfr_tests/security-tests/auth-security.js)
+2. Authorization & access control — regular user vs admin routes, unauthenticated access, positive controls (nfr_tests/security-tests/authz-security.js)
+3. NoSQL injection — operator injection on login, forgot-password, product filters, role injection on register (nfr_tests/security-tests/injection-security.js)
+4. Sensitive data exposure — password hash leakage, stack trace leakage, X-Powered-By header, security answer leakage (nfr_tests/security-tests/data-exposure-security.js)
+
+**Test setup & configuration (MS3)**
+- Shared security testing configuration (nfr_tests/security-tests/config.js)
+- Shared test helpers for user registration and login (nfr_tests/security-tests/helpers.js)
+- k6-based white-box penetration testing scripts
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- Set up n8n locally and built the Issue path of the combined workflow — generates test plans from the issue description using the Gemini API
+- Used Claude and Gemini throughout MS1–MS3 to accelerate understanding the codebase, brainstorm test cases, debug errors, and generate boilerplate test code
 
 ### Amanda Quek Yan Ling
 **Features unit tested: (MS1)**
