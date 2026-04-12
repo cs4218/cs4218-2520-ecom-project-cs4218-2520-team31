@@ -52,6 +52,15 @@ Source files tested & unit test files created
    4. Admin product create and update (tests/admin-product.spec.ts)
    5. Admin category CRUD management (tests/admin-category.spec.ts)
 
+**Non-Functional Testing — Security Testing (MS3)**
+   - Tool: Grafana k6 (penetration testing)
+   - Test type: Security testing (white-box penetration testing)
+   1. Authentication security — JWT tampering, forged tokens, algorithm "none" attack, malformed headers (security-tests/auth-security.js)
+   2. Authorization & access control — regular user vs admin routes, unauthenticated access, positive controls (security-tests/authz-security.js)
+   3. NoSQL injection — operator injection on login, forgot-password, product filters, role injection on register (security-tests/injection-security.js)
+   4. Sensitive data exposure — password hash leakage, stack trace leakage, X-Powered-By header, security answer leakage (security-tests/data-exposure-security.js)
+   5. Shared config and helpers (security-tests/config.js, security-tests/helpers.js)
+
 ### Amanda Quek Yan Ling
 **Features unit tested: (MS1)**
    1. Product features
