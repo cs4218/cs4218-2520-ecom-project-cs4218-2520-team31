@@ -10,3 +10,5 @@ sonarqube_conf.txt
 sonar-project.properties
 .claude/
 /notes/
+/.venv/
+/memory/
