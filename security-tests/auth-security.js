@@ -1,6 +1,6 @@
 // Fajar Ibnu Fatihan, A0314606L
 // Story 4.2: Authentication Security Tests
-// Category: Web Security (prof slides) / Broken Authentication (OWASP)
+// Category: Broken Authentication
 // Technique: Penetration Testing
 
 import http from "k6/http";
@@ -13,15 +13,13 @@ export const options = {
   iterations: 1,
   vus: 1,
   thresholds: {
-    checks: ["rate==1.0"], // all checks must pass
+    checks: ["rate==1.0"],
   },
 };
 
-// Admin credentials from .env
 const ADMIN_EMAIL = __ENV.ADMIN_EMAIL || "testadmin@test.com";
 const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD || "testadmin123";
 
-// Base64url helpers for JWT manipulation
 function decodeBase64url(str) {
   const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
   const bytes = encoding.b64decode(base64, "rawstd");
@@ -38,9 +36,7 @@ function encodeBase64url(str) {
 }
 
 export default function () {
-  // --- Setup: get a valid token first ---
   const { token } = loginUser(ADMIN_EMAIL, ADMIN_PASSWORD);
-
 
   // Test 1: JWT Tampering — modified payload
   group("JWT Tampering - modified payload", function () {
@@ -76,10 +72,7 @@ export default function () {
     });
   });
 
-
-  // Test 3: Algorithm "none" attack
-  // Classic JWT vulnerability: set alg to "none" and strip the signature.
-  // Buggy JWT libraries accept this and skip verification entirely.
+  // Test 3: Algorithm "none" attack (CVE-2015-9235)
   group("Algorithm none attack", function () {
     const noneHeader = encodeBase64url(JSON.stringify({ alg: "none", typ: "JWT" }));
     const nonePayload = encodeBase64url(
@@ -88,7 +81,6 @@ export default function () {
         iat: Math.floor(Date.now() / 1000),
       })
     );
-    // Two variants: empty signature and no signature at all
     const noneToken1 = noneHeader + "." + nonePayload + ".";
     const noneToken2 = noneHeader + "." + nonePayload;
 
@@ -105,7 +97,6 @@ export default function () {
       "alg:none without signature returns 401": (r) => r.status === 401,
     });
   });
-
 
   // Test 4: Malformed Authorization header
   group("Malformed Authorization header", function () {
@@ -134,7 +125,6 @@ export default function () {
       "no auth header returns 401": (r) => r.status === 401,
     });
   });
-
 
   // Test 6: Password hash not in login response
   group("Password not exposed in login response", function () {

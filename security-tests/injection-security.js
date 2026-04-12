@@ -20,7 +20,6 @@ const ADMIN_EMAIL = __ENV.ADMIN_EMAIL || "testadmin@test.com";
 const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD || "testadmin123";
 
 export default function () {
-
   // Test 1: $gt operator injection on login
   group("NoSQL $gt injection on login", function () {
     const res = http.post(
@@ -79,8 +78,7 @@ export default function () {
     });
   });
 
-  // BUG: forgot-password is vulnerable to NoSQL injection (authController.js:133)
-  // findOne({ email, answer }) passes user input directly to MongoDB
+  // BUG: forgot-password vulnerable to NoSQL injection (authController.js:133)
   group("NoSQL injection on forgot-password", function () {
     const res = http.post(
       ENDPOINTS.forgotPassword,
@@ -130,7 +128,6 @@ export default function () {
   });
 
   // BUG: product filter does not validate input types (productController.js:246)
-  // Passing objects instead of arrays bypasses filters and returns all products
   group("NoSQL injection on product filters", function () {
     const res = http.post(
       ENDPOINTS.getProduct.replace("get-product", "product-filters"),
