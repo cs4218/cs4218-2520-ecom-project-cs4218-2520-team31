@@ -24,6 +24,19 @@ Source files tested & unit test files created
 2. Admin create product -> Product on product list (admin-product-view.spec.ts)
 3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
 
+**Load Tests (MS3)**
+Scenarios tested & load test scripts created
+1. Product listing (product-list-load.test.js)
+2. Product search/filter (product-search-load.test.js)
+3. Product details (product-details-load.test.js)
+4. Product count retrieval (product-count-load.test.js)
+5. Category retrieval (category-load.test.js)
+
+**Test setup & configuration (MS3)**
+- Shared load testing configuration (load-testing/scripts/config.js)
+- Staged load profiles (low load, baseline load, high load)
+- k6-based automated load testing scripts
+
 ### Fajar Ibnu Fatihan
 **Features unit tested:**
    1. Authentication feature (Login, Register, Forgot Password)
