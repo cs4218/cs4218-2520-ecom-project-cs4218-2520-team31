@@ -4,7 +4,7 @@
 
 This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
 
-### Brenna Lauren Tan
+### Brenna Lauren Tan Jia Ern
 **Unit Tests (MS1)**
 
 Source files tested & unit test files created
@@ -24,7 +24,7 @@ Source files tested & unit test files created
 2. Admin create product -> Product on product list (admin-product-view.spec.ts)
 3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
 
-**Load Tests (MS3)**
+**NFR Tests (MS3) - Load Tests**
 Scenarios tested & load test scripts created
 1. Product listing (product-list-load.test.js)
 2. Product search/filter (product-search-load.test.js)
@@ -36,6 +36,12 @@ Scenarios tested & load test scripts created
 - Shared load testing configuration (load-testing/scripts/config.js)
 - Staged load profiles (low load, baseline load, high load)
 - k6-based automated load testing scripts
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- n8n workflow for test execution on GitHub events
+- GitHub integration using API nodes
+- Test result capture and logging
+- Automated bot commenting based on GitHub PR event
 
 ### Fajar Ibnu Fatihan
 **Features unit tested:**
