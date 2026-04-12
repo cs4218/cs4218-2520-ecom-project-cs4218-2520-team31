@@ -132,6 +132,7 @@ Scenarios tested & security test scripts created
    7. Product details → Product photo rendering (tests/product-photo.spec.ts)
 
 **NFR Tests (MS3) - Recovery Tests**
+
 Scenarios tested & load test scripts created
 1. Product API recovery (product-recovery-test.jmx)
 Backend failure during product listing
@@ -165,10 +166,9 @@ Continuous login requests during recovery
 - Integrated Google Gemini API within n8n workflow
 - Generated AI comments to review code changes and suggest potential issues
 - Used AI feedback to identify edge cases and improve test coverage
-
 - Used GitHub Copilot for Test Development
 
-Used GitHub Copilot while writing unit tests (MS1)
+
 
 ## 1. Project Introduction
 
