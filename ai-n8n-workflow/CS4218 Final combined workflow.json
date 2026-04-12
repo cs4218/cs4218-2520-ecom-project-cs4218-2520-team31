@@ -1,0 +1,836 @@
+{
+  "name": "CS4218 Final combined workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1d220052-b53f-494a-aefb-055334960224",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"repoOwner\": \"cs4218\",\n  \"repoName\": \"cs4218-2520-ecom-project-cs4218-2520-team31\",\n  \"mode\": \"pr\",\n  \"issueNumber\": 18,\n  \"prNumber\": 19,\n  \"issueBotMarker\": \"## AI-ISSUE-TEST-PLAN\",\n  \"prBotMarker\": \"## AI-TEST-BOT REPORT\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a9ecbd1e-baa2-4b61-826f-f15f03221f1b",
+      "name": "Set Mode + IDs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "43a6ac17-4794-4478-9155-75ee7320543d",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "issue",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "919c1f53-ce72-4fdd-9594-715a8bb2a474",
+      "name": "If Mode = Issue"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repoOwner }}/{{ $json.repoName }}/issues/{{ $json.issueNumber }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        576,
+        -128
+      ],
+      "id": "9b451470-8dc6-4ed5-be4c-82291a0ea7b3",
+      "name": "Get Issue Details",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const issue = $json;\nconst setup = $('Set Mode + IDs').first().json;\n\nconst issueTitle = issue.title || '';\nconst issueBody = issue.body || '';\nconst labels = (issue.labels || []).map(l => l.name || '');\n\nconst prompt = `\nYou are an AI software testing planning assistant for a university software engineering project.\n\nAn issue has been created. Based on the issue title and description, generate a testing-oriented planning comment.\n\nIssue Title: ${issueTitle}\nIssue Body: ${issueBody}\nLabels: ${labels.join(', ') || 'none'}\n\nReturn your answer in markdown with these sections only:\n\n## AI Issue Testing Plan\n\n### Likely Affected Areas\nList the parts of the system likely impacted.\n\n### Acceptance Criteria Suggestions\nGive 4 to 6 clear acceptance criteria.\n\n### Priority Test Checklist\nProvide a checklist:\n- [ ] item (test type)\n\nInclude:\n- happy path\n- edge cases\n- invalid input\n- regression risk\n\n### Suggested Prompt for Implementing Tests\nWrite 1 strong prompt for generating the most useful tests for this issue.\n\nKeep it specific and practical.\n`;\n\nreturn [{\n  json: {\n    repoOwner: setup.repoOwner,\n    repoName: setup.repoName,\n    issueNumber: setup.issueNumber,\n    issueTitle,\n    issueBody,\n    issueUrl: issue.html_url,\n    issueBotMarker: setup.issueBotMarker,\n    aiPrompt: prompt\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -128
+      ],
+      "id": "c8519caf-53a4-4f06-b36f-9a8cb679e7a4",
+      "name": "Build Issue Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.aiPrompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        992,
+        -128
+      ],
+      "id": "155d0f36-edbc-4c4c-9725-3439d1c9858f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        992,
+        48
+      ],
+      "id": "ed55f26e-0af6-403e-992e-dab5361827a4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Mk6pFmxB4zP58MpR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = $json.output || $json.text || $json.response || 'No AI output generated.';\nconst meta = $('Build Issue Prompt').first().json;\n\nconst commentBody = [\n  '## AI-ISSUE-TEST-PLAN',\n  '',\n  `**Issue:** #${meta.issueNumber} - ${meta.issueTitle}`,\n  `**Issue Link:** ${meta.issueUrl}`,\n  '',\n  aiOutput,\n  '',\n  '---',\n  '_Generated by n8n AI planning workflow_'\n].join('\\n');\n\nreturn [{\n  json: {\n    repoOwner: meta.repoOwner,\n    repoName: meta.repoName,\n    issueNumber: meta.issueNumber,\n    commentBody\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -128
+      ],
+      "id": "bbf94311-42d5-46d9-b80a-cc1aaed5f057",
+      "name": "Build Issue Comment"
+    },
+    {
+      "parameters": {
+        "operation": "createComment",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Build Issue Comment').item.json.repoOwner }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Build Issue Comment').item.json.repoName }}",
+          "mode": "name"
+        },
+        "issueNumber": "={{ $('Build Issue Comment').item.json.issueNumber }}",
+        "body": "={{ $('Build Issue Comment').item.json.commentBody }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        -128
+      ],
+      "id": "f3af1e46-9f9f-4533-8f48-d8df555fb4da",
+      "name": "Create a comment on an issue",
+      "webhookId": "00301984-7df7-43d3-beed-1e4b2f46c27b",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repoOwner }}/{{ $json.repoName }}/pulls/{{ $json.prNumber }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        592,
+        304
+      ],
+      "id": "243a570e-eeb9-41b5-aa39-969e94c6616f",
+      "name": "Get PR Details",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pr = $json;\nconst setup = $('Set Mode + IDs').first().json;\n\nconst prBody = pr.body || '';\nconst prTitle = pr.title || '';\n\nconst match = prBody.match(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|related to)\\s+#(\\d+)/i);\nconst linkedIssueNumber = match ? Number(match[1]) : null;\n\nreturn [{\n  json: {\n    repoOwner: setup.repoOwner,\n    repoName: setup.repoName,\n    prNumber: setup.prNumber,\n    prTitle,\n    prBody,\n    prUrl: pr.html_url,\n    author: pr.user?.login || 'unknown',\n    baseBranch: pr.base?.ref || '',\n    headBranch: pr.head?.ref || '',\n    headSha: pr.head?.sha || '',\n    linkedIssueNumber,\n    prBotMarker: setup.prBotMarker\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        320
+      ],
+      "id": "0b7ec868-6685-4531-95b7-092062b7cb2f",
+      "name": "Parse Linked Issue"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1a048100-6b18-45d0-bc1d-e3c86f32006e",
+              "leftValue": "={{ $json.linkedIssueNumber }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        320
+      ],
+      "id": "e3fe9bca-3544-4b3c-9176-88961e1a016b",
+      "name": "If Linked Issue Exists"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repoOwner }}/{{ $json.repoName }}/issues/{{ $json.linkedIssueNumber }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1168,
+        208
+      ],
+      "id": "4039f03b-340c-41cb-8158-ce1d97ecc8db",
+      "name": "Get Linked Issue Details",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const issue = $json;\nconst pr = $('Parse Linked Issue').first().json;\n\nreturn [{\n  json: {\n    ...pr,\n    linkedIssueTitle: issue.title || '',\n    linkedIssueBody: issue.body || '',\n    linkedIssueUrl: issue.html_url || '',\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        224
+      ],
+      "id": "cf827629-16d4-4021-9514-f9de73682a1a",
+      "name": "Merge PR + Issue Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "const pr = $json;\n\nreturn [{\n  json: {\n    ...pr,\n    linkedIssueTitle: '',\n    linkedIssueBody: '',\n    linkedIssueUrl: '',\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        368
+      ],
+      "id": "2fe3e250-da1a-4adb-b1e9-1d1849474b1b",
+      "name": "Merge PR + Empty Issue Context"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1584,
+        336
+      ],
+      "id": "e0389125-a81b-42cf-9de1-f15442cb104b",
+      "name": "Merge Issue Context Result"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repoOwner }}/{{ $json.repoName }}/pulls/{{ $json.prNumber }}/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1792,
+        336
+      ],
+      "id": "2699b504-7283-4c7b-a82f-bb69c261a3dd",
+      "name": "Get PR Files",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const files = $input.all().map(item => item.json);\nconst meta = $('Merge Issue Context Result').first().json;\n\nconst filenames = files.map(f => f.filename || '');\nconst title = (meta.prTitle || '').toLowerCase();\n\nconst hasPath = (keyword) => filenames.some(f => f.toLowerCase().includes(keyword));\nconst titleHas = (keyword) => title.includes(keyword);\n\nlet categories = [];\nlet risk = 'Low';\n\nif (\n  titleHas('auth') || titleHas('login') || titleHas('register') ||\n  hasPath('auth') || hasPath('login') || hasPath('register')\n) categories.push('auth');\n\nif (\n  titleHas('payment') || titleHas('checkout') || titleHas('braintree') ||\n  hasPath('payment') || hasPath('checkout') || hasPath('braintree')\n) categories.push('payment');\n\nif (\n  titleHas('product') || hasPath('product')\n) categories.push('product');\n\nif (\n  hasPath('client/src/pages') || hasPath('client/src/components')\n) categories.push('frontend-ui');\n\nif (\n  hasPath('controllers/') || hasPath('routes/') || hasPath('models/') || hasPath('middlewares/')\n) categories.push('backend-api');\n\nif (\n  filenames.length > 0 &&\n  filenames.every(f => f.endsWith('.test.js') || f.includes('_tests_'))\n) categories.push('testing-only');\n\nif (titleHas('fix') || titleHas('bug')) categories.push('bugfix');\nif (titleHas('refactor') || titleHas('cleanup')) categories.push('refactor');\n\ncategories = [...new Set(categories)];\n\nconst highRiskSignals =\n  categories.includes('payment') ||\n  categories.includes('auth') ||\n  filenames.some(f => /controller|middleware|routes|checkout|payment|auth/i.test(f));\n\nconst medRiskSignals =\n  categories.includes('backend-api') ||\n  categories.includes('product') ||\n  filenames.length > 5;\n\nif (highRiskSignals) risk = 'High';\nelse if (medRiskSignals) risk = 'Medium';\n\nlet diffText = '';\nfor (const file of files) {\n  const patch = (file.patch || '_No patch available._').replace(/```/g, \"'''\");\n  diffText += `### File: ${file.filename}\\n\\n\\`\\`\\`diff\\n${patch}\\n\\`\\`\\`\\n\\n---\\n\\n`;\n}\n\nreturn [{\n  json: {\n    ...meta,\n    categories,\n    risk,\n    filenames,\n    diffText\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        608
+      ],
+      "id": "8d90e175-1522-4165-9067-6132f37f2692",
+      "name": "Build PR + Diff Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\n\nconst prompt = `\nYou are an AI software testing reviewer for a university software engineering project.\n\nAnalyze this pull request and produce a concise, practical testing report.\n\nLinked Issue Title: ${data.linkedIssueTitle || 'None'}\nLinked Issue Body: ${data.linkedIssueBody || 'None'}\n\nPR Title: ${data.prTitle}\nPR Body: ${data.prBody}\nCategories: ${data.categories.join(', ') || 'general'}\nRisk Level: ${data.risk}\n\nChanged Files:\n${data.filenames.map(f => `- ${f}`).join('\\n')}\n\nCode Diffs:\n${data.diffText}\n\nReturn your answer in markdown with these sections only:\n\n## AI-Driven Testing Report\n\n### Linked Issue Alignment\nState whether the PR appears aligned with the linked issue.\n\n### PR Classification\n- Category\n- Risk level\n- Main modules affected\n\n### Change Summary\nSummarize what changed in 3 to 5 bullets.\n\n### Recommended Test Focus\nState what kinds of tests are most important.\n\n### Priority Test Ideas\nProvide a checklist:\n- [ ] item (test type)\n\nAt least 6 items.\n\n### Suggested Prompt for Writing Tests\nWrite 1 strong prompt for generating the most important tests.\n\n### Notes for Reviewers\nMention blind spots or regression risks.\n`;\n\nreturn [{\n  json: {\n    ...data,\n    aiPrompt: prompt\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        608
+      ],
+      "id": "2abdbd3e-054f-456d-8076-6bac709dd1f1",
+      "name": "Build PR AI Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.aiPrompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1024,
+        608
+      ],
+      "id": "9d224d67-1fa0-4611-afdf-d76bd0ae7590",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        768
+      ],
+      "id": "48331dd3-c486-4258-adca-0a1436df54a6",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Mk6pFmxB4zP58MpR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ai = $json;\nconst pr = $('Build PR + Diff Context').first().json;\n\nconst aiOutput =\n  ai.output ||\n  ai.text ||\n  ai.response ||\n  ai.content ||\n  'No AI output generated.';\n\nconst reviewText = String(aiOutput);\n\n// derive a simple overall status from AI output\nlet overallStatus = '⚠️ REVIEW NEEDED';\nif (reviewText.includes('### Review Status') && reviewText.match(/OK/i)) {\n  overallStatus = '✅ OK';\n}\nif (reviewText.includes('HIGH RISK') || pr.risk === 'High') {\n  overallStatus = '❌ HIGH RISK';\n}\n\nconst linkedIssueDetected = pr.linkedIssueNumber ? 'Yes' : 'No';\n\nconst keyLines = reviewText\n  .split('\\n')\n  .filter(line =>\n    line.trim().startsWith('- ') ||\n    line.trim().startsWith('[ ]') ||\n    line.trim().startsWith('- [ ]')\n  )\n  .slice(0, 8);\n\nconst fallbackLines = [\n  `- PR is ${pr.linkedIssueNumber ? 'linked to issue #' + pr.linkedIssueNumber : 'not linked to an issue'}`,\n  `- Risk level assessed as ${pr.risk}`,\n  `- Categories: ${pr.categories.join(', ') || 'general'}`,\n  `- ${pr.changedFilesCount} changed file(s), ${pr.changedTestFilesCount} changed test file(s)`,\n];\n\nconst excerpt = (keyLines.length ? keyLines : fallbackLines).join('\\n');\n\nconst commentBody = [\n  '## AI Test Review Summary',\n  '',\n  `**Overall status:** ${overallStatus}`,\n  `**Linked issue detected:** ${linkedIssueDetected}`,\n  `**Risk level:** ${pr.risk}`,\n  `**Changed files:** ${pr.changedFilesCount}`,\n  `**Changed test files:** ${pr.changedTestFilesCount}`,\n  '',\n  '**Key output:**',\n  '```text',\n  excerpt,\n  '```',\n  '',\n  aiOutput,\n  '',\n  '---',\n  '_Generated by n8n AI-driven testing workflow_'\n].join('\\n');\n\nreturn [{\n  json: {\n    repoOwner: pr.repoOwner,\n    repoName: pr.repoName,\n    prNumber: pr.prNumber,\n    commentBody,\n    prBotMarker: pr.prBotMarker\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        608
+      ],
+      "id": "251c2137-9d75-43e7-9d61-31e086443a4c",
+      "name": "Build Combined PR Report"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repoOwner }}/{{ $json.repoName }}/issues/{{ $json.prNumber }}/comments",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1504,
+        608
+      ],
+      "id": "3d0e2f32-69a1-4669-9992-fde9a8b28285",
+      "name": "Get Existing PR Comments",
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const comments = $input.all().map(i => i.json);\nconst marker = $('Set Mode + IDs').first().json.prBotMarker;\n\nconst existing = comments.find(c =>\n  c.body && c.body.includes(marker)\n);\n\nreturn [{\n  json: {\n    existingCommentId: existing ? existing.id : null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        608
+      ],
+      "id": "c30ddbc6-8770-4878-964c-b961aacc8d96",
+      "name": "Check Existing Bot Comment"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "898e41a2-126e-4736-8081-82b28da4e067",
+              "leftValue": "={{ $json.existingCommentId.toString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        928
+      ],
+      "id": "14dfee21-7c2b-43a9-9b48-164cc539ab43",
+      "name": "If Existing Comment"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.github.com/repos/{{ $('Build Combined PR Report').item.json.repoOwner }}/{{ $('Build Combined PR Report').item.json.repoName }}/issues/comments/{{ $('Check Existing Bot Comment').item.json.existingCommentId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $('Build Combined PR Report').item.json.commentBody }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        832,
+        832
+      ],
+      "id": "92c46c9c-fc17-4f46-bce8-0dfe095c14e4",
+      "name": "Edit Existing Comment",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createComment",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Build Combined PR Report').item.json.repoOwner }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Build Combined PR Report').item.json.repoName }}",
+          "mode": "name"
+        },
+        "issueNumber": "={{ $('Build Combined PR Report').item.json.prNumber }}",
+        "body": "={{ $('Build Combined PR Report').item.json.commentBody }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        1024
+      ],
+      "id": "617f84ac-1a9c-4015-99fc-3bb874585bd0",
+      "name": "Create PR Comment",
+      "webhookId": "abf629a1-f4c1-4cf4-bb53-ae124b538fb9",
+      "credentials": {
+        "githubApi": {
+          "id": "BKuqAQXdnS9JndZa",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Mode + IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Mode + IDs": {
+      "main": [
+        [
+          {
+            "node": "If Mode = Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Mode = Issue": {
+      "main": [
+        [
+          {
+            "node": "Get Issue Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get PR Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issue Details": {
+      "main": [
+        [
+          {
+            "node": "Build Issue Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Issue Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Build Issue Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Issue Comment": {
+      "main": [
+        [
+          {
+            "node": "Create a comment on an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PR Details": {
+      "main": [
+        [
+          {
+            "node": "Parse Linked Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Linked Issue": {
+      "main": [
+        [
+          {
+            "node": "If Linked Issue Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Linked Issue Exists": {
+      "main": [
+        [
+          {
+            "node": "Get Linked Issue Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge PR + Empty Issue Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Linked Issue Details": {
+      "main": [
+        [
+          {
+            "node": "Merge PR + Issue Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge PR + Issue Context": {
+      "main": [
+        [
+          {
+            "node": "Merge Issue Context Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge PR + Empty Issue Context": {
+      "main": [
+        [
+          {
+            "node": "Merge Issue Context Result",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Issue Context Result": {
+      "main": [
+        [
+          {
+            "node": "Get PR Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PR Files": {
+      "main": [
+        [
+          {
+            "node": "Build PR + Diff Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build PR + Diff Context": {
+      "main": [
+        [
+          {
+            "node": "Build PR AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build PR AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Build Combined PR Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Combined PR Report": {
+      "main": [
+        [
+          {
+            "node": "Get Existing PR Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing PR Comments": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Bot Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Bot Comment": {
+      "main": [
+        [
+          {
+            "node": "If Existing Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Existing Comment": {
+      "main": [
+        [
+          {
+            "node": "Edit Existing Comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create PR Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ffa31fbf-09e4-4dde-930d-db36c1270192",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eb3b901e7ba2c30b913384c919fe21c40b1aef73d0505a22887d9a56efd97e05"
+  },
+  "id": "IWccOmoETEvOwsx8",
+  "tags": []
+}

@@ -4,7 +4,7 @@
 
 This project’s testing work was divided by component ownership and testing scope. Below is a summary of each member’s contributions.
 
-### Brenna Lauren Tan
+### Brenna Lauren Tan Jia Ern
 **Unit Tests (MS1)**
 
 Source files tested & unit test files created
@@ -23,6 +23,26 @@ Source files tested & unit test files created
 1. Login -> Checkout/Pay -> Order appears in user orders (checkout-orders.spec.ts)
 2. Admin create product -> Product on product list (admin-product-view.spec.ts)
 3. Admin update product -> Updated product on product list (admin-product-view.spec.ts)
+
+**NFR Tests (MS3) - Load Tests**
+
+Scenarios tested & load test scripts created
+1. Product listing (product-list-load.test.js)
+2. Product search/filter (product-search-load.test.js)
+3. Product details (product-details-load.test.js)
+4. Product count retrieval (product-count-load.test.js)
+5. Category retrieval (category-load.test.js)
+
+**Test setup & configuration (MS3)**
+- Shared load testing configuration (load-testing/scripts/config.js)
+- Staged load profiles (low load, baseline load, high load)
+- k6-based automated load testing scripts
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- n8n workflow for test execution on GitHub events
+- GitHub integration using API nodes
+- Test result capture and logging
+- Automated bot commenting based on GitHub PR event
 
 ### Fajar Ibnu Fatihan
 **Features unit tested:**
@@ -51,6 +71,23 @@ Source files tested & unit test files created
    3. Authentication error handling and redirects (tests/auth-error.spec.ts)
    4. Admin product create and update (tests/admin-product.spec.ts)
    5. Admin category CRUD management (tests/admin-category.spec.ts)
+
+**NFR Tests (MS3) — Security Tests**
+
+Scenarios tested & security test scripts created
+1. Authentication security — JWT tampering, forged tokens, algorithm "none" attack, malformed headers (nfr_tests/security-tests/auth-security.js)
+2. Authorization & access control — regular user vs admin routes, unauthenticated access, positive controls (nfr_tests/security-tests/authz-security.js)
+3. NoSQL injection — operator injection on login, forgot-password, product filters, role injection on register (nfr_tests/security-tests/injection-security.js)
+4. Sensitive data exposure — password hash leakage, stack trace leakage, X-Powered-By header, security answer leakage (nfr_tests/security-tests/data-exposure-security.js)
+
+**Test setup & configuration (MS3)**
+- Shared security testing configuration (nfr_tests/security-tests/config.js)
+- Shared test helpers for user registration and login (nfr_tests/security-tests/helpers.js)
+- k6-based white-box penetration testing scripts
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- Set up n8n locally and built the Issue path of the combined workflow — generates test plans from the issue description using the Gemini API
+- Used Claude and Gemini throughout MS1–MS3 to accelerate understanding the codebase, brainstorm test cases, debug errors, and generate boilerplate test code
 
 ### Amanda Quek Yan Ling
 **Features unit tested: (MS1)**
@@ -93,6 +130,44 @@ Source files tested & unit test files created
    5. Product details → Related products → Navigate to another product (tests/related-products.spec.ts)
    6. Homepage → Search product (tests/product-search.spec.ts)
    7. Product details → Product photo rendering (tests/product-photo.spec.ts)
+
+**NFR Tests (MS3) - Recovery Tests**
+
+Scenarios tested & load test scripts created
+1. Product API recovery (product-recovery-test.jmx)
+Backend failure during product listing
+Product search during backend downtime
+Category retrieval during service failure
+Product category requests during backend restart
+
+2.  Database recovery testing (used product-recovery-test.jmx) 
+MongoDB shutdown during access to Product APIs
+Continuous API requests during database downtime
+Database restart and system stabilisation
+
+3. Authentication recovery (authentication-recovery-test.jmx)
+Login requests during backend failure
+Register requests during backend failure
+Authentication service restart recovery
+Continuous login requests during recovery
+
+**Test setup & configuration (MS3)**
+- Apache JMeter recovery testing configuration
+- Thread Group for continuous request execution
+- HTTP Request Defaults for API configuration
+- HTTP Header Manager for authentication headers
+- Summary Report listener for performance metrics
+- Aggregate Report listener for statistical analysis
+- Graph Results listener for recovery visualisation
+
+**AI-Driven Testing (MS1+MS2+MS3)**
+- Set up n8n locally to automate AI-assisted testing workflow
+- Configured workflow to retrieve GitHub repository data using GitHub API
+- Integrated Google Gemini API within n8n workflow
+- Generated AI comments to review code changes and suggest potential issues
+- Used AI feedback to identify edge cases and improve test coverage
+- Used GitHub Copilot for Test Development
+
 
 
 ## 1. Project Introduction
